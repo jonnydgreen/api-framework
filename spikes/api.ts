@@ -32,6 +32,7 @@ const listKey = Symbol("framework.list");
 function List<T>(input: MaybeClassType<T>): T[] {
   return listKey as unknown as T[];
 }
+type List<T> = T[];
 
 const tupleKey = Symbol("framework.tuple");
 
@@ -73,7 +74,7 @@ export class Controller {
   }
 
   @Post({ outputType: List(Hello) })
-  public getHelloList(): Hello[] {
+  public getHelloList(): List<Hello> {
     return [{
       name: "name",
       address: "address",
@@ -86,6 +87,14 @@ export class Controller {
       name: "name",
       address: "address",
     }, "hello"];
+  }
+
+  @Post({ outputType: Union(Hello, String) })
+  public getHelloUnion(): Hello | string {
+    return {
+      name: "name",
+      address: "address",
+    };
   }
 }
 
