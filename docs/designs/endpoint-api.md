@@ -56,7 +56,7 @@ type-safe decorators.
 Lead: @jonnydgreen
 
 ```typescript
-@Object({
+@ObjectType({
   description: "Some description.",
   examples: [{
     name: "Hello",
