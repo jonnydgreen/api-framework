@@ -112,7 +112,7 @@ Lead: @jonnydgreen
 
 ```typescript
 export class HelloController {
-  @Post({ outputType: Tuple(Hello, String, Number) })
+  @Post({ outputType: Tuple(Hello, String, Number, Hello) })
   public getHelloTuple(): [Hello, string, number] {
     return [
       {
@@ -121,6 +121,10 @@ export class HelloController {
       },
       "hello",
       1,
+      {
+        name: "name",
+        address: "address",
+      },
     ];
   }
 }

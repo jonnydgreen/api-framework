@@ -1,0 +1,12 @@
+{
+  "version": "3",
+  "redirects": {
+    "https://cdn.skypack.dev/-/@octokit/graphql@v4.8.0-EbMgAhtBEVS5THey9fbY/dist=es2019,mode=types/index.d.ts": "https://cdn.skypack.dev/-/@octokit/graphql@v4.8.0-EbMgAhtBEVS5THey9fbY/dist=es2019,mode=types/dist-types/index.d.ts",
+    "https://cdn.skypack.dev/-/@octokit/openapi-types@v11.2.0-gu1h7aCgAJhI0Ck7YfZg/dist=es2019,mode=types/index.d.ts": "https://cdn.skypack.dev/-/@octokit/openapi-types@v11.2.0-gu1h7aCgAJhI0Ck7YfZg/dist=es2019,mode=types/types.d.ts",
+    "https://cdn.skypack.dev/-/@octokit/request-error@v2.1.0-eEdMdUdHjpMHPFvA4aCp/dist=es2019,mode=types/index.d.ts": "https://cdn.skypack.dev/-/@octokit/request-error@v2.1.0-eEdMdUdHjpMHPFvA4aCp/dist=es2019,mode=types/dist-types/index.d.ts",
+    "https://cdn.skypack.dev/-/@octokit/request@v5.6.3-8MiyZSoy8B73C1K9nYC8/dist=es2019,mode=types/index.d.ts": "https://cdn.skypack.dev/-/@octokit/request@v5.6.3-8MiyZSoy8B73C1K9nYC8/dist=es2019,mode=types/dist-types/index.d.ts",
+    "https://cdn.skypack.dev/-/@octokit/types@v6.33.0-CLItWMbWROrzbdY30nuK/dist=es2019,mode=types/index.d.ts": "https://cdn.skypack.dev/-/@octokit/types@v6.33.0-CLItWMbWROrzbdY30nuK/dist=es2019,mode=types/dist-types/index.d.ts",
+    "https://cdn.skypack.dev/-/@octokit/types@v6.34.0-YyJmQq3Ajv0ACapsoOVh/dist=es2019,mode=types/index.d.ts": "https://cdn.skypack.dev/-/@octokit/types@v6.34.0-YyJmQq3Ajv0ACapsoOVh/dist=es2019,mode=types/dist-types/index.d.ts"
+  },
+  "remote": {}
+}

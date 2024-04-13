@@ -1,5 +1,7 @@
 #!/usr/bin/env deno run
 
+// Copyright 2023-2024 the API framework authors. All rights reserved. MIT license.
+
 // deno-lint-ignore-file
 
 export type ClassType<T> = new (...args: any[]) => T;
@@ -92,13 +94,14 @@ export class Controller {
     ];
   }
 
-  @Post({ outputType: Union(Hello, String) })
-  public getHelloUnion(): Hello | string {
-    return {
-      name: "name",
-      address: "address",
-    };
-  }
+  // TODO: Implement Union type
+  // @Post({ outputType: Union(Hello, String) })
+  // public getHelloUnion(): Hello | string {
+  //   return {
+  //     name: "name",
+  //     address: "address",
+  //   };
+  // }
 }
 
 const c = new Controller();

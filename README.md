@@ -14,7 +14,7 @@ may include breaking changes.**
 
 ## License
 
-Nifty li'l tricks packages are 100% free and open-source, under the
+API Framework packages are 100% free and open-source, under the
 [MIT license](https://github.com/jonnydgreen/api-framework/blob/main/LICENSE).
 
 This package is [Treeware](https://treeware.earth). If you use it in production,
