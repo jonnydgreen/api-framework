@@ -1,6 +1,6 @@
 #!/usr/bin/env deno run
 
-// Copyright 2023-2024 the API framework authors. All rights reserved. MIT license.
+// Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 // deno-lint-ignore-file
 
