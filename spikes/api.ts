@@ -8,11 +8,16 @@ export type MaybeClassType<T> = ClassType<T> | T;
 
 type MaybeClassTypes<T> = { [P in keyof T]: MaybeClassType<T[P]> };
 
-type MapScalar<T> = T extends String ? string
-  : T extends Number ? number
-  : T extends Boolean ? boolean
-  : T extends undefined ? undefined
-  : T extends null ? null
+type MapScalar<T> = T extends String
+  ? string
+  : T extends Number
+  ? number
+  : T extends Boolean
+  ? boolean
+  : T extends undefined
+  ? undefined
+  : T extends null
+  ? null
   : T;
 
 type MapTypes<T> = { [P in keyof T]: MapScalar<T[P]> };
@@ -22,9 +27,30 @@ export class Hello {
   public address!: string;
 }
 
+export interface ObjectType {
+  __typename: string;
+}
+
+export class Apple implements ObjectType {
+  public __typename!: "Apple";
+  public ripeness!: string;
+  public color!: string;
+}
+
+export class Orange implements ObjectType {
+  public __typename!: "Orange";
+  public ripeness!: string;
+  public tang!: string;
+}
+
+export class JackFruit implements ObjectType {
+  public __typename!: "JackFruit";
+  public ripeness!: string;
+  public jack!: string;
+}
+
 export interface PostOptions<R> {
   outputType: MaybeClassType<R>;
-  isArray?: boolean;
 }
 
 const listKey = Symbol("framework.list");
@@ -42,17 +68,30 @@ function Tuple<U, T extends any[]>(
   return tupleKey as unknown as MapTypes<[U, ...T]>;
 }
 
+const unionKey = Symbol("framework.union");
+
+type UnionTypes<T> = T extends (infer U)[] ? MapScalar<U> : never;
+
+function Union<U, T extends any[]>(
+  first: MaybeClassType<U>,
+  ...args: MaybeClassTypes<T>
+): UnionTypes<[U, ...T]> {
+  return unionKey as unknown as UnionTypes<[U, ...T]>;
+}
+
 export type MaybePromise<T> = T;
 
 function Post<R>(options: PostOptions<R>) {
   return function post<T extends (...args: any[]) => MaybePromise<R>>(
     target: T,
-    context: ClassMethodDecoratorContext,
+    context: ClassMethodDecoratorContext
   ): void {
     const methodName = context.name;
     if (context.private) {
       throw new Error(
-        `'bound' cannot decorate private properties like ${methodName as string}.`,
+        `'bound' cannot decorate private properties like ${
+          methodName as string
+        }.`
       );
     }
     context.addInitializer(function (this: unknown) {
@@ -74,18 +113,32 @@ export class Controller {
 
   @Post({ outputType: List(Hello) })
   public getHelloList(): Hello[] {
-    return [{
-      name: "name",
-      address: "address",
-    }];
+    return [
+      {
+        name: "name",
+        address: "address",
+      },
+    ];
   }
 
   @Post({ outputType: Tuple(Hello, String) })
   public getHelloTuple(): [Hello, string] {
-    return [{
-      name: "name",
-      address: "address",
-    }, "hello"];
+    return [
+      {
+        name: "name",
+        address: "address",
+      },
+      "hello",
+    ];
+  }
+
+  @Post({ outputType: Union(Orange, Apple, JackFruit) })
+  public getHelloUnion(): Orange | Apple | JackFruit {
+    return {
+      __typename: "Orange",
+      ripeness: "ripe",
+      tang: "tangy",
+    };
   }
 }
 
