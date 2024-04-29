@@ -20,7 +20,7 @@ const EXCLUDED_DIRS = [
 
 const ROOT = new URL("../", import.meta.url);
 const CHECK = Deno.args.includes("--check");
-const FIRST_YEAR = 2023;
+const FIRST_YEAR = 2024;
 const CURRENT_YEAR = new Date().getFullYear();
 const RX_COPYRIGHT = new RegExp(
   `// Copyright ([0-9]{4})-([0-9]{4}) the API framework authors\\. All rights reserved\\. MIT license\\.\n`,
