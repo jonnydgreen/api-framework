@@ -1,5 +1,4 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-
 import { blue, red, yellow } from "@std/fmt/colors";
 import { walk } from "@std/fs/walk";
 import ts, {
@@ -19,7 +18,6 @@ const EXCLUDED_PATHS = [
   "_tools",
   "node_modules",
   "npm",
-  "examples/nifty-lil-tricks-testing-nodejs",
   "scripts",
   "sandbox",
 ];
@@ -56,9 +54,11 @@ function checkImportStatements(
     const { moduleSpecifier } = importDeclaration;
     const importPath = (moduleSpecifier as StringLiteral).text;
     const isRelative = importPath.startsWith(".");
-    const isInternal = importPath.startsWith(
-      "https://deno.land/x/nifty_lil_tricks_testing/",
-    );
+    // TODO: uncomment when the start path is known
+    // const isInternal = importPath.startsWith(
+    //   "",
+    // );
+    const isInternal = false;
     const isAllowedExternalDep = ALLOWED_EXTERNAL_DEPS.some((dep) =>
       importPath.startsWith(dep)
     );
