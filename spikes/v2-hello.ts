@@ -1,3 +1,4 @@
+// Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 import { assert } from "https://deno.land/std@0.127.0/_util/assert.ts";
 import { Field, ObjectType } from "./types.ts";
 
