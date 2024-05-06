@@ -44,7 +44,7 @@ function Tuple<U, T extends any[]>(
   return tupleKey as unknown as MapTypes<[U, ...T]>;
 }
 
-export type MaybePromise<T> = T;
+export type MaybePromise<T> = T | Promise<T>;
 
 function Post<R>(options: PostOptions<R>) {
   return function post<T extends (...args: any[]) => MaybePromise<R>>(
