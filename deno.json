@@ -5,7 +5,8 @@
     "fmt": "deno fmt --check && deno task fmt:license-headers",
     "fmt:license-headers": "deno run --allow-read --allow-write ./_tools/check_license.ts",
     "lint": "deno lint && deno task lint:doc-imports",
-    "lint:doc-imports": "deno run --allow-env --allow-read ./_tools/check_doc_imports.ts"
+    "lint:doc-imports": "deno run --allow-env --allow-read ./_tools/check_doc_imports.ts",
+    "test": "deno test --doc"
   },
   "lock": false,
   "imports": {
