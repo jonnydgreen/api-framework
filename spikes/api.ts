@@ -1,5 +1,7 @@
 #!/usr/bin/env deno run
 
+// Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
+
 // deno-lint-ignore-file
 
 export type ClassType<T> = new (...args: any[]) => T;
@@ -8,16 +10,11 @@ export type MaybeClassType<T> = ClassType<T> | T;
 
 type MaybeClassTypes<T> = { [P in keyof T]: MaybeClassType<T[P]> };
 
-type MapScalar<T> = T extends String
-  ? string
-  : T extends Number
-  ? number
-  : T extends Boolean
-  ? boolean
-  : T extends undefined
-  ? undefined
-  : T extends null
-  ? null
+type MapScalar<T> = T extends String ? string
+  : T extends Number ? number
+  : T extends Boolean ? boolean
+  : T extends undefined ? undefined
+  : T extends null ? null
   : T;
 
 type MapTypes<T> = { [P in keyof T]: MapScalar<T[P]> };
@@ -84,14 +81,12 @@ export type MaybePromise<T> = T;
 function Post<R>(options: PostOptions<R>) {
   return function post<T extends (...args: any[]) => MaybePromise<R>>(
     target: T,
-    context: ClassMethodDecoratorContext
+    context: ClassMethodDecoratorContext,
   ): void {
     const methodName = context.name;
     if (context.private) {
       throw new Error(
-        `'bound' cannot decorate private properties like ${
-          methodName as string
-        }.`
+        `'bound' cannot decorate private properties like ${methodName as string}.`,
       );
     }
     context.addInitializer(function (this: unknown) {
@@ -121,14 +116,15 @@ export class Controller {
     ];
   }
 
-  @Post({ outputType: Tuple(Hello, String) })
-  public getHelloTuple(): [Hello, string] {
+  @Post({ outputType: Tuple(Hello, String, Number) })
+  public getHelloTuple(): [Hello, string, number] {
     return [
       {
         name: "name",
         address: "address",
       },
       "hello",
+      1,
     ];
   }
 
@@ -140,6 +136,15 @@ export class Controller {
       tang: "tangy",
     };
   }
+
+  // TODO: Implement Union type
+  // @Post({ outputType: Union(Hello, String) })
+  // public getHelloUnion(): Hello | string {
+  //   return {
+  //     name: "name",
+  //     address: "address",
+  //   };
+  // }
 }
 
 const c = new Controller();

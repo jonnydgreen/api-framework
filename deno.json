@@ -1,5 +1,17 @@
 {
   "tasks": {
-    "ok": "deno lint && deno fmt --check"
+    "ok": "deno task fmt && deno task lint && deno task check",
+    "check": "deno check **/*.ts",
+    "fmt": "deno fmt --check && deno task fmt:license-headers",
+    "fmt:license-headers": "deno run --allow-read --allow-write ./_tools/check_license.ts",
+    "lint": "deno lint && deno task lint:doc-imports",
+    "lint:doc-imports": "deno run --allow-env --allow-read ./_tools/check_doc_imports.ts"
+  },
+  "lock": false,
+  "imports": {
+    "@npm/typescript": "npm:typescript@5.4.5",
+    "@std/fmt": "jsr:@std/fmt@^0.222.1",
+    "@std/fs": "jsr:@std/fs@^0.222.1",
+    "@std/path": "jsr:@std/path@^0.222.1"
   }
 }

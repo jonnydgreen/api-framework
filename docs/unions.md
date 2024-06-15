@@ -58,7 +58,8 @@ export class Controller {
 }
 ```
 
-If anything is inputted which is not of the three types, a TypeScript error is emitted:
+If anything is inputted which is not of the three types, a TypeScript error is
+emitted:
 
 ```typescript
 // Argument of type '() => Orange | Apple | JackFruit' is not assignable to parameter of type '(...args: any[]) => Orange | Apple'.
@@ -129,4 +130,3 @@ correspond to the `ObjectType`s they defined.
   type-resolver function
   [like this](https://typegraphql.com/docs/unions.html#resolving-type)
 -
-
