@@ -24,9 +24,30 @@ export class Hello {
   public address!: string;
 }
 
+export interface ObjectType {
+  __typename: string;
+}
+
+export class Apple implements ObjectType {
+  public __typename!: "Apple";
+  public ripeness!: string;
+  public color!: string;
+}
+
+export class Orange implements ObjectType {
+  public __typename!: "Orange";
+  public ripeness!: string;
+  public tang!: string;
+}
+
+export class JackFruit implements ObjectType {
+  public __typename!: "JackFruit";
+  public ripeness!: string;
+  public jack!: string;
+}
+
 export interface PostOptions<R> {
   outputType: MaybeClassType<R>;
-  isArray?: boolean;
 }
 
 const listKey = Symbol("framework.list");
@@ -42,6 +63,17 @@ function Tuple<U, T extends any[]>(
   ...args: MaybeClassTypes<T>
 ): MapTypes<[U, ...T]> {
   return tupleKey as unknown as MapTypes<[U, ...T]>;
+}
+
+const unionKey = Symbol("framework.union");
+
+type UnionTypes<T> = T extends (infer U)[] ? MapScalar<U> : never;
+
+function Union<U, T extends any[]>(
+  first: MaybeClassType<U>,
+  ...args: MaybeClassTypes<T>
+): UnionTypes<[U, ...T]> {
+  return unionKey as unknown as UnionTypes<[U, ...T]>;
 }
 
 export type MaybePromise<T> = T;
@@ -76,10 +108,12 @@ export class Controller {
 
   @Post({ outputType: List(Hello) })
   public getHelloList(): Hello[] {
-    return [{
-      name: "name",
-      address: "address",
-    }];
+    return [
+      {
+        name: "name",
+        address: "address",
+      },
+    ];
   }
 
   @Post({ outputType: Tuple(Hello, String, Number) })
@@ -92,6 +126,15 @@ export class Controller {
       "hello",
       1,
     ];
+  }
+
+  @Post({ outputType: Union(Orange, Apple, JackFruit) })
+  public getHelloUnion(): Orange | Apple | JackFruit {
+    return {
+      __typename: "Orange",
+      ripeness: "ripe",
+      tang: "tangy",
+    };
   }
 
   // TODO: Implement Union type
