@@ -1,6 +1,6 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assert } from "jsr:@std/assert@^0.222.1/assert";
+import { assert } from "@std/assert";
 import { getTypeInfo } from "./types.ts";
 import { Hello as V1Hello } from "./v1-hello.ts";
 import { Hello as V2Hello } from "./v2-hello.ts";
