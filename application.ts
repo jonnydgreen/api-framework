@@ -1,8 +1,14 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
+// TODO: doc-strings with full examples
+
 import { OakPlatformAdapter } from "./platforms/oak_adapter.ts";
 import { Platform } from "./platforms/platform.ts";
 
+/**
+ * A class which starts the API applications and allows one to register
+ * routes and capabilities to process inbound requests against.
+ */
 export class Application {
   #platform: Platform;
 
@@ -11,10 +17,18 @@ export class Application {
     this.#platform = new OakPlatformAdapter();
   }
 
+  /**
+   * Register a version of an API.
+   * @param options - The required options to register an API version.
+   */
   public registerVersion(options: ApplicationVersionOptions): void {
     this.#platform.registerVersion(options);
   }
 
+  /**
+   * Start listening for requests, processing registered routes for each request.
+   * @param options - The required options to start listening for requests.
+   */
   public async listen(options?: ApplicationListenOptions): Promise<void> {
     await this.#platform.listen({
       ...options,
@@ -31,6 +45,8 @@ export interface ApplicationListenOptions {
   /**
    * The port to listen on.
    *
+   * When the port is set to `0`, the operating system will select the port.
+   *
    * @default {8080} */
   port?: number;
 
@@ -46,14 +62,30 @@ export interface ApplicationListenOptions {
   hostname?: string;
 }
 
-// TODO: docs
+/**
+ * The Application route version. The following version conventions are supported:
+ *  - `^v[0-9]+$`
+ *  - `^v[0-9]beta[0-9]+$`
+ *  - `^v[0-9]alpha[0-9]+$`
+ */
 export type ApplicationVersion = `v${number}${
-  | `alpha${number}`
+  | ""
   | `beta${number}`
-  | ""}`;
+  | `alpha${number}`}`;
 
-// TODO: docs
+/**
+ * The application version options when registering a version.
+ */
 export interface ApplicationVersionOptions {
+  /**
+   * The application version to register. Must be unique to the application.
+   */
   version: ApplicationVersion;
+  /**
+   * The controllers to register for the application version. Each controller
+   * route path will be prefixed with the application version. For example, if
+   * a controller route of `/properties` is registered, then the application route
+   * will be `/v1/properties` when the version is `v1`.
+   */
   controllers: unknown[];
 }

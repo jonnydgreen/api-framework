@@ -1,5 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
+// TODO: doc-strings with full examples
+
 import { Application, ApplicationListenEvent } from "@oak/oak/application";
 import { Router } from "@oak/oak/router";
 import type {
