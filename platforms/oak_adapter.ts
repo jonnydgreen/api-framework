@@ -3,12 +3,14 @@
 // TODO: doc-strings with full examples
 
 import { Application, ApplicationListenEvent } from "@oak/oak/application";
-import { Router } from "@oak/oak/router";
+import { Router, RouterMiddleware } from "@oak/oak/router";
 import type {
   ApplicationListenOptions,
   ApplicationVersionOptions,
 } from "../application.ts";
 import type { Platform } from "./platform.ts";
+import { getControllerRoutes } from "../router.ts";
+import { assertNever } from "../utils.ts";
 
 export class OakPlatformAdapter implements Platform {
   #app: Application;
@@ -23,18 +25,24 @@ export class OakPlatformAdapter implements Platform {
       sensitive: true,
     });
     for (const controller of options.controllers) {
-      router.get("/messages", (ctx) => {
-        ctx.response.body = `<!DOCTYPE html>
-      <html>
-        <head><title>Hello oak!</title><head>
-        <body>
-          <h1>Hello oak!</h1>
-        </body>
-      </html>
-    `;
-      });
+      const routes = getControllerRoutes(controller);
+      for (const route of routes) {
+        let registerRouteFn: <R extends string>(
+          path: string,
+          middleware: RouterMiddleware<R>,
+        ) => void;
+        switch (route.method) {
+          case "GET": {
+            registerRouteFn = router.get.bind(router);
+            break;
+          }
+          default: {
+            assertNever(route.method, `Method ${route.method} not supported`);
+          }
+        }
+        registerRouteFn(route.path, route.handler);
+      }
     }
-
     this.#app.use(router.routes());
     this.#app.use(router.allowedMethods());
   }

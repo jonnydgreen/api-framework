@@ -8,6 +8,7 @@ const app = new Application();
 
 app.registerVersion({
   version: "v1",
+  // deno-lint-ignore no-explicit-any
   controllers: ["" as any],
   // TODO: uncomment
   // controllers: [MessageController],
