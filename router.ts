@@ -6,25 +6,33 @@ export function getControllerRoutes(_controller: unknown): ControllerRoute[] {
   return [{
     method: "GET",
     path: "/messages",
-    handler(ctx) {
-      ctx.response.body = `<!DOCTYPE html>
+    handler(): Response {
+      return new Response(
+        `<!DOCTYPE html>
       <html>
         <head><title>Hello there!</title><head>
         <body>
           <h1>Hello there!</h1>
         </body>
       </html>
-    `;
+    `,
+        { status: 200 },
+      );
     },
   }];
 }
 
 export type HttpMethod = "GET";
 
+export interface Context {
+  request: Request;
+}
+
 export interface ControllerRoute {
   method: HttpMethod;
   path: `/${string}`;
-  // TODO: fix-up handler to something sensible
-  // deno-lint-ignore no-explicit-any
-  handler(...args: any[]): void | Promise<void>;
+  handler(
+    ctx: Context,
+    params: Record<string, string | undefined>,
+  ): Response | Promise<Response>;
 }

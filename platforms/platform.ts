@@ -7,6 +7,12 @@ import type {
   ApplicationVersionOptions,
 } from "../application.ts";
 
+// TODO: docs
+export const enum PlatformStrategy {
+  Oak = "Oak",
+  Core = "Core",
+}
+
 /**
  * The Platform Adaptor interface that all adaptors implement.
  *

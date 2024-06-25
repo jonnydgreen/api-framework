@@ -2,19 +2,36 @@
 
 // TODO: doc-strings with full examples
 
+import { CorePlatformAdapter } from "./platforms/core_adapter.ts";
 import { OakPlatformAdapter } from "./platforms/oak_adapter.ts";
-import { Platform } from "./platforms/platform.ts";
+import { Platform, PlatformStrategy } from "./platforms/platform.ts";
 
 /**
  * A class which starts the API applications and allows one to register
  * routes and capabilities to process inbound requests against.
  */
 export class Application {
-  #platform: Platform;
+  readonly #platform: Platform;
+  readonly #options: ApplicationOptions;
 
-  constructor() {
-    // TODO: make this configurable
-    this.#platform = new OakPlatformAdapter();
+  constructor(options?: ApplicationOptions) {
+    this.#options = options ?? {};
+
+    // TODO: is it best practice to combine a strategy and adapter pattern in this way?
+    const platform = options?.platform ?? PlatformStrategy.Core;
+    switch (platform) {
+      case PlatformStrategy.Oak: {
+        this.#platform = new OakPlatformAdapter();
+        break;
+      }
+      case PlatformStrategy.Core: {
+        this.#platform = new CorePlatformAdapter();
+        break;
+      }
+      default: {
+        this.#platform = platform;
+      }
+    }
   }
 
   /**
@@ -36,6 +53,13 @@ export class Application {
       hostname: options?.hostname ?? "0.0.0.0",
     });
   }
+}
+
+/**
+ * The Application Options
+ */
+export interface ApplicationOptions {
+  platform?: PlatformStrategy | Platform;
 }
 
 /**
