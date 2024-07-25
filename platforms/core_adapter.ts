@@ -41,6 +41,7 @@ export class CorePlatformAdapter implements Platform {
           routeDetails.set(route.method, route);
           this.#routes.set(routePath, routeDetails);
         }
+        console.log(`Registered route: ${route.method} ${route.path}`);
       }
     }
   }

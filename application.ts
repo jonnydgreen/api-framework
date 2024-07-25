@@ -3,7 +3,6 @@
 // TODO: doc-strings with full examples
 
 import { CorePlatformAdapter } from "./platforms/core_adapter.ts";
-import { OakPlatformAdapter } from "./platforms/oak_adapter.ts";
 import { Platform, PlatformStrategy } from "./platforms/platform.ts";
 
 /**
@@ -20,10 +19,6 @@ export class Application {
     // TODO: is it best practice to combine a strategy and adapter pattern in this way?
     const platform = options?.platform ?? PlatformStrategy.Core;
     switch (platform) {
-      case PlatformStrategy.Oak: {
-        this.#platform = new OakPlatformAdapter();
-        break;
-      }
       case PlatformStrategy.Core: {
         this.#platform = new CorePlatformAdapter();
         break;

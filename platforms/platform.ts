@@ -9,7 +9,6 @@ import type {
 
 // TODO: docs
 export const enum PlatformStrategy {
-  Oak = "Oak",
   Core = "Core",
 }
 
