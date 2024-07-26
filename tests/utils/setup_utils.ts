@@ -37,3 +37,18 @@ export function setupApplication(): [
   const origin = new URL(`http://${server.addr.hostname}:${server.addr.port}`);
   return [app, server, origin];
 }
+
+export function setupPermissions(
+  options?: Deno.PermissionOptionsObject,
+): Deno.PermissionOptionsObject {
+  const baseNetPermissions = ["0.0.0.0", "localhost"];
+  const netPermissions = options?.net
+    ? Array.isArray(options.net)
+      ? [...options.net, ...baseNetPermissions]
+      : options.net
+    : baseNetPermissions;
+  return {
+    ...options,
+    net: netPermissions,
+  };
+}

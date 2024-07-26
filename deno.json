@@ -6,7 +6,10 @@
     "fmt:license-headers": "deno run --allow-read --allow-write ./_tools/check_license.ts",
     "lint": "deno lint && deno task lint:doc-imports",
     "lint:doc-imports": "deno run --allow-env --allow-read ./_tools/check_doc_imports.ts",
-    "test": "deno test --doc"
+    "test": "deno test --allow-net=\"0.0.0.0,localhost\"",
+    "cov": "deno task test -- --coverage=cov_profile --clean",
+    "cov:html": "deno task cov && deno coverage --exclude=tests cov_profile --html && open cov_profile/html/index.html",
+    "cov:lcov": "deno task cov && deno coverage --exclude=tests cov_profile --lcov --output=cov_profile.lcov"
   },
   "lock": false,
   "imports": {

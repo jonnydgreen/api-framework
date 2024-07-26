@@ -2,12 +2,12 @@
 
 import { assertEquals, assertStrictEquals } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
-import { setupApplication } from "./utils/setup_utils.ts";
+import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 
 Deno.test({
   name: "Get() registers a GET route",
-  permissions: { net: true },
+  permissions: setupPermissions(),
   async fn() {
     // Arrange
     const [, server, origin] = setupApplication();
