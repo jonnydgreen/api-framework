@@ -25,7 +25,7 @@ export function setupApplication(): [
     }
   }
 
-  const app = new Application({ logLevel: "CRITICAL" });
+  const app = new Application({ logLevel: "DEBUG" });
   new MessageController();
 
   app.registerVersion({
