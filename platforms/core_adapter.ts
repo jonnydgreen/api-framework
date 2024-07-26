@@ -3,7 +3,7 @@
 // TODO: doc-strings with full examples
 
 import { assert } from "@std/assert";
-import { join } from "@std/path/posix/join";
+import { join } from "@std/path/join";
 import type {
   ApplicationListenOptions,
   ApplicationVersionOptions,
