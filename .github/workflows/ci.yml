@@ -32,10 +32,10 @@ jobs:
         run: deno task ok
 
       - name: Run tests
-        run: deno task cov
+        run: deno task test
 
       - name: Generate lcov
-        run: deno task cov:lcov
+        run: deno task lcov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
