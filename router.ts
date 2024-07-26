@@ -3,8 +3,8 @@
 import { assertExists } from "@std/assert";
 import { join } from "@std/path/join";
 import { controllers, routes } from "./decorators.ts";
-import { handleResponse } from "./response.ts";
 import type { Context } from "./logger.ts";
+import { handleResponse } from "./response.ts";
 
 // TODO: doc-strings with full examples
 
@@ -20,10 +20,7 @@ export function getControllerRoutes(_controller: unknown): ControllerRoute[] {
     );
     controllerRoutes.push({
       method: route.method,
-      path: join(controller.path, route.path).replace(/\/+$/, "").replace(
-        /^\/+/,
-        "/",
-      ) as `/${string}`,
+      path: buildRoutePath(controller.path, route.path),
       // TODO: maybe do this elsewhere and leave the handler largely as is
       // TODO: don't always make a promise
       // TODO: need serialisation flows here
@@ -48,4 +45,13 @@ export interface ControllerRoute {
     ctx: Context,
     params: Record<string, string | undefined>,
   ): Response | Promise<Response>;
+}
+
+export function buildRoutePath(...paths: string[]): `/${string}` {
+  const pathname = join(...paths).replaceAll("\\", "/").replace(/\/+$/, "")
+    .replace(
+      /^\/+/,
+      "/",
+    );
+  return pathname as `/${string}`;
 }

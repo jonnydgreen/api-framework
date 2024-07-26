@@ -3,15 +3,18 @@
 // TODO: doc-strings with full examples
 
 import { assert } from "@std/assert";
-import { join } from "@std/path/join";
 import type {
   ApplicationListenOptions,
   ApplicationVersionOptions,
 } from "../application.ts";
-import { type ControllerRoute, getControllerRoutes } from "../router.ts";
-import type { Platform, Server } from "./platform.ts";
 import { Context, ServerContext } from "../logger.ts";
 import { handleResponse } from "../response.ts";
+import {
+  buildRoutePath,
+  type ControllerRoute,
+  getControllerRoutes,
+} from "../router.ts";
+import type { Platform, Server } from "./platform.ts";
 
 export class CorePlatformAdapter implements Platform {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;
@@ -27,7 +30,7 @@ export class CorePlatformAdapter implements Platform {
     for (const controller of options.controllers) {
       const routes = getControllerRoutes(controller);
       for (const route of routes) {
-        const routePath = join(prefix, route.path);
+        const routePath = buildRoutePath(prefix, route.path);
         const methods = this.#routes.get(routePath);
         if (methods) {
           const routeDetails = methods.get(route.method);
