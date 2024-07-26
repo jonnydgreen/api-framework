@@ -64,6 +64,7 @@ export class CorePlatformAdapter implements Platform {
   ): Response | Promise<Response> {
     const ctx = new Context(this.#ctx, request);
     for (const [pathname, methods] of this.#routes) {
+      console.log(request.url, pathname);
       const match = new URLPattern({ pathname }).exec(request.url);
       if (match) {
         const params = match.pathname.groups;
