@@ -1,12 +1,12 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assertEquals, assertStrictEquals } from "@std/assert";
-import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
+import { assertStrictEquals } from "@std/assert";
+import { calculate } from "@std/http/etag";
 import { setupApplication } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 
 Deno.test({
-  name: "Get() registers a GET route",
+  name: "Headers returns an etag matching the response body",
   permissions: { net: true },
   async fn() {
     // Arrange
@@ -15,20 +15,13 @@ Deno.test({
 
     // Act
     const response = await fetch(url, { method: "GET" });
+    const text = await response.text();
+    const etag = response.headers.get("etag");
+    const calculatedEtag = await calculate(text);
 
     // Assert
-    assertStrictEquals(response.status, STATUS_CODE.OK);
-    assertStrictEquals(response.statusText, STATUS_TEXT[STATUS_CODE.OK]);
-    assertEquals(await response.json(), [
-      {
-        id: "1",
-        content: "Hello",
-      },
-      {
-        id: "2",
-        content: "Hiya",
-      },
-    ]);
+    assertStrictEquals(etag, '"3a-4LK1qVw5XhkwLXL43X7Y0zU89+a"');
+    assertStrictEquals(etag, calculatedEtag);
     await teardownServer(server);
   },
 });

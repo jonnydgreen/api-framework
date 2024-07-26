@@ -3,6 +3,8 @@
 import { assertExists } from "@std/assert";
 import { join } from "@std/path/join";
 import { controllers, routes } from "./decorators.ts";
+import { handleResponse } from "./response.ts";
+import type { Context } from "./logger.ts";
 
 // TODO: doc-strings with full examples
 
@@ -25,9 +27,12 @@ export function getControllerRoutes(_controller: unknown): ControllerRoute[] {
       // TODO: maybe do this elsewhere and leave the handler largely as is
       // TODO: don't always make a promise
       // TODO: need serialisation flows here
-      async handler(): Promise<Response> {
+      async handler(ctx): Promise<Response> {
         const result = await route.handler();
-        return new Response(JSON.stringify(result), { status: 200 });
+        // TODO: move the below line into handle response
+        // TODO: consider having the response as the last thing
+        const body = JSON.stringify(result);
+        return handleResponse(ctx, body, { status: 200 });
       },
     });
   });
@@ -35,10 +40,6 @@ export function getControllerRoutes(_controller: unknown): ControllerRoute[] {
 }
 
 export type HttpMethod = "GET";
-
-export interface Context {
-  request: Request;
-}
 
 export interface ControllerRoute {
   method: HttpMethod;

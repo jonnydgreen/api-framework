@@ -8,13 +8,10 @@ import type {
   ApplicationListenOptions,
   ApplicationVersionOptions,
 } from "../application.ts";
-import {
-  Context,
-  type ControllerRoute,
-  getControllerRoutes,
-} from "../router.ts";
+import { type ControllerRoute, getControllerRoutes } from "../router.ts";
 import type { Platform, Server } from "./platform.ts";
-import { ServerContext } from "../logger.ts";
+import { Context, ServerContext } from "../logger.ts";
+import { handleResponse } from "../response.ts";
 
 export class CorePlatformAdapter implements Platform {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;
@@ -65,26 +62,27 @@ export class CorePlatformAdapter implements Platform {
     request: Request,
     _info: Deno.ServeHandlerInfo,
   ): Response | Promise<Response> {
+    const ctx = new Context(this.#ctx, request);
     for (const [pathname, methods] of this.#routes) {
       const match = new URLPattern({ pathname }).exec(request.url);
       if (match) {
         const params = match.pathname.groups;
         const route = methods.get(request.method);
         if (route) {
-          const ctx: Context = { request };
-          return route.handler(ctx, params);
+          return handleResponse(ctx, route.handler(ctx, params));
         }
-        return this.#notFoundResponse(request);
+        return this.#notFoundResponse(ctx);
       }
     }
-    return this.#notFoundResponse(request);
+    return this.#notFoundResponse(ctx);
   }
 
-  #notFoundResponse(request: Request): Response {
+  #notFoundResponse(ctx: Context): Promise<Response> {
+    const { request } = ctx;
     const body = JSON.stringify({
       message: `Route ${request.method} ${request.url} not found`,
     });
-    return new Response(body, { status: 404 });
+    return handleResponse(ctx, body, { status: 404 });
   }
 
   #onListen({ hostname, port }: Deno.NetAddr): void {
