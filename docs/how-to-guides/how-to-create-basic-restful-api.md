@@ -16,7 +16,7 @@ everything steams from.
 // app.ts
 const app = new Application();
 
-await app.listen();
+app.listen();
 ```
 
 Before registering a route, you must setup everything associated with it. Here,

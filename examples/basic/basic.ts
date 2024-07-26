@@ -10,4 +10,4 @@ app.registerVersion({
   controllers: [MessageController],
 });
 
-await app.listen();
+app.listen();

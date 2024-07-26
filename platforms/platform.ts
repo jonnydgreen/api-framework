@@ -12,6 +12,13 @@ export const enum PlatformStrategy {
   Core = "Core",
 }
 
+// TODO: doc string
+export interface Server {
+  finished: Promise<void>;
+  shutdown(): Promise<void>;
+  addr: Deno.NetAddr;
+}
+
 /**
  * The Platform Adaptor interface that all adaptors implement.
  *
@@ -28,7 +35,7 @@ export interface Platform {
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
    */
-  listen(options: Required<ApplicationListenOptions>): Promise<void>;
+  listen(options: Required<ApplicationListenOptions>): Server;
 }
 
 /**

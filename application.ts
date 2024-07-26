@@ -2,25 +2,38 @@
 
 // TODO: doc-strings with full examples
 
+// TODO: define ourselves
+import type { LevelName, Logger } from "@std/log";
 import { CorePlatformAdapter } from "./platforms/core_adapter.ts";
-import { Platform, PlatformStrategy } from "./platforms/platform.ts";
+import {
+  type Platform,
+  PlatformStrategy,
+  type Server,
+} from "./platforms/platform.ts";
+import { ServerContext } from "./logger.ts";
 
 /**
  * A class which starts the API applications and allows one to register
  * routes and capabilities to process inbound requests against.
  */
 export class Application {
-  readonly #platform: Platform;
-  readonly #options: ApplicationOptions;
+  readonly #platform: Readonly<Platform>;
+  readonly #options: Readonly<ApplicationOptions>;
+
+  public readonly ctx: Readonly<ServerContext>;
+
+  public readonly log: Readonly<Logger>;
 
   constructor(options?: ApplicationOptions) {
     this.#options = options ?? {};
+    this.ctx = new ServerContext(options?.logLevel);
+    this.log = this.ctx.log;
 
     // TODO: is it best practice to combine a strategy and adapter pattern in this way?
     const platform = options?.platform ?? PlatformStrategy.Core;
     switch (platform) {
       case PlatformStrategy.Core: {
-        this.#platform = new CorePlatformAdapter();
+        this.#platform = new CorePlatformAdapter(this.ctx);
         break;
       }
       default: {
@@ -41,8 +54,8 @@ export class Application {
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
    */
-  public async listen(options?: ApplicationListenOptions): Promise<void> {
-    await this.#platform.listen({
+  public listen(options?: ApplicationListenOptions): Server {
+    return this.#platform.listen({
       ...options,
       port: options?.port ?? 8080,
       hostname: options?.hostname ?? "0.0.0.0",
@@ -55,6 +68,7 @@ export class Application {
  */
 export interface ApplicationOptions {
   platform?: PlatformStrategy | Platform;
+  logLevel?: LevelName;
 }
 
 /**

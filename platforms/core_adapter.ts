@@ -13,13 +13,16 @@ import {
   type ControllerRoute,
   getControllerRoutes,
 } from "../router.ts";
-import type { Platform } from "./platform.ts";
+import type { Platform, Server } from "./platform.ts";
+import { ServerContext } from "../logger.ts";
 
 export class CorePlatformAdapter implements Platform {
-  #routes: Map<string, Map<string, ControllerRoute>>;
+  readonly #routes: Map<string, Map<string, ControllerRoute>>;
+  readonly #ctx: ServerContext;
 
-  constructor() {
+  constructor(ctx: Readonly<ServerContext>) {
     this.#routes = new Map();
+    this.#ctx = ctx;
   }
 
   public registerVersion(options: Required<ApplicationVersionOptions>): void {
@@ -41,23 +44,21 @@ export class CorePlatformAdapter implements Platform {
           routeDetails.set(route.method, route);
           this.#routes.set(routePath, routeDetails);
         }
-        console.log(`Registered route: ${route.method} ${route.path}`);
+        this.#ctx.log.debug(`Registered route: ${route.method} ${routePath}`);
       }
     }
   }
 
-  public async listen(
+  public listen(
     options: Required<ApplicationListenOptions>,
-  ): Promise<void> {
+  ): Server {
     const onListen = this.#onListen.bind(this);
     const handler = this.#handler.bind(this);
-    const server = Deno.serve({
+    return Deno.serve({
       onListen,
       port: options?.port,
       hostname: options?.hostname,
     }, handler);
-
-    await server.finished;
   }
 
   #handler(
@@ -87,7 +88,7 @@ export class CorePlatformAdapter implements Platform {
   }
 
   #onListen({ hostname, port }: Deno.NetAddr): void {
-    console.log(
+    this.#ctx.log.info(
       `Listening on: http://${hostname ?? "localhost"}:${port}`,
     );
   }

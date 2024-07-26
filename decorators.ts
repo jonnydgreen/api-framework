@@ -20,11 +20,6 @@ function registerClass<Class extends ClassType>(
   target: Class,
 ): symbol {
   const key = Symbol(target.name);
-  console.log(
-    `[DEBUG] Registering object type '${target.name}' with key '${
-      String(key)
-    }'`,
-  );
   Object.assign(target, { [typeKey]: key });
   return key;
 }
