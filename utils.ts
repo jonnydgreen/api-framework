@@ -23,7 +23,7 @@ export type ClassType<T = any> = new (...args: any[]) => T;
 
 export type MaybeClassType<T> = ClassType<T> | T;
 
-export type MaybePromise<T> = T;
+export type MaybePromise<T> = T | Promise<T>;
 
 // Acceptable function type definition
 // deno-lint-ignore no-explicit-any

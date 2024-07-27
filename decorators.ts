@@ -2,11 +2,14 @@
 import { assert } from "@std/assert";
 import { getClassKey, type Injectable, registerClass } from "./kernel.ts";
 import type { ClassType, MaybePromise } from "./utils.ts";
+import { HttpMethod } from "./router.ts";
 
 export interface ControllerMetadata {
   path: string;
 }
+
 export const controllers = new Map<symbol, ControllerMetadata>();
+export const routes = new Map<symbol, RouteMetadata>();
 
 export function Controller(path: `/${string}`) {
   function controllerDecorator(
@@ -33,19 +36,12 @@ export interface GetOptions<R> {
   path: `/${string}`;
 }
 
-// TODO: enum
-export type HttpMethod = "GET";
-
 export interface RouteMetadata {
   method: HttpMethod;
   path: `/${string}`;
   controller: symbol;
   propertyName: string | symbol;
-  // TODO: define better args
-  // handler(...args: unknown[]): MaybePromise<unknown>;
 }
-
-export const routes = new Map<symbol, RouteMetadata>();
 
 export function Get<R>(options: GetOptions<R>) {
   return function get<T extends (...args: unknown[]) => MaybePromise<R>>(
@@ -53,22 +49,24 @@ export function Get<R>(options: GetOptions<R>) {
     context: ClassMethodDecoratorContext,
   ): void {
     const methodName = context.name;
+    const key = Symbol(String(methodName));
     context.addInitializer(function (this: unknown) {
       const thisArg = this as ClassType;
       const className = thisArg.constructor.name;
-      const classKey = getClassKey(thisArg.constructor);
       const methodSlug = `${className}.${String(methodName)}`;
-      const key = Symbol(methodSlug);
+      const classKey = getClassKey(thisArg.constructor);
       assert(
         !context.private,
         `'Get' cannot decorate private property: ${methodSlug}`,
       );
-      routes.set(key, {
-        method: "GET",
-        path: options.path,
-        controller: classKey,
-        propertyName: methodName,
-      });
+      if (!routes.has(key)) {
+        routes.set(key, {
+          method: HttpMethod.GET,
+          path: options.path,
+          controller: classKey,
+          propertyName: methodName,
+        });
+      }
     });
   };
 }

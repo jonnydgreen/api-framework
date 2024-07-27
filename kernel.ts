@@ -28,12 +28,12 @@ function makeInjectable(target: ClassType): void {
   decorate(injectable(), target);
 }
 
-export function register<T>(
+export function registerSingleton<T>(
   container: Kernel,
   type: symbol,
   target: ClassType<T>,
   ...types: symbol[]
-): interfaces.BindingInWhenOnSyntax<T> {
+): interfaces.BindingWhenOnSyntax<T> {
   if (!metadata.injectable[target.name]) {
     makeInjectable(target);
     metadata.injectable[target.name] = true;
@@ -46,7 +46,7 @@ export function register<T>(
       metadata.inject[injectKey] = true;
     }
   }
-  return container.bind<T>(type).to(target);
+  return container.bind<T>(type).to(target).inSingletonScope();
 }
 
 const classRegistrations = new Map<symbol, ClassType>();
@@ -131,7 +131,10 @@ export async function buildKernel(ctx: ServerContext): Promise<Kernel> {
         `Unable register to register ${key.description}: unsupported parameter definition at position ${idx}`,
       );
     });
-    register(kernel, key, target, ...paramKeys);
+    registerSingleton(kernel, key, target, ...paramKeys);
+    ctx.log.debug(
+      `Registered ${key.description} in the kernel`,
+    );
   }
   ctx.log.debug("Built server kernel");
   return kernel;

@@ -4,13 +4,16 @@ import { assertExists } from "@std/assert";
 import { join } from "@std/path/join";
 import { controllers, routes } from "./decorators.ts";
 import type { Context } from "./logger.ts";
-import { handleResponse } from "./response.ts";
+import { processResponse } from "./response.ts";
 import { getClassKey, getClassMethod, Kernel } from "./kernel.ts";
-import type { ClassType, Fn } from "./utils.ts";
+import type { ClassType, Fn, MaybePromise } from "./utils.ts";
 
 // TODO: doc-strings with full examples
 
-export type Handler = (ctx: Context) => Promise<unknown>;
+export type Handler = (
+  ctx: Context,
+  params: Record<string, string | undefined>,
+) => MaybePromise<Response | object | BodyInit | null>;
 
 // TODO: move to server context
 // function getRouteHandler(
@@ -54,31 +57,26 @@ export function buildControllerRoutes(
         // TODO: move the below line into handle response
         // TODO: consider having the response as the last thing
         const body = JSON.stringify(result);
-        return handleResponse(ctx, body, { status: 200 });
+        return processResponse(ctx, body, { status: 200 });
       },
     });
   }
   return controllerRoutes;
 }
 
-export type HttpMethod = "GET";
-
-export interface ControllerRoute {
-  method: HttpMethod;
-  path: `/${string}`;
-  handler(
-    ctx: Context,
-    params: Record<string, string | undefined>,
-  ): Response | Promise<Response>;
+// TODO: check if available in std
+export const enum HttpMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
 }
 
 export interface ControllerRoute {
   method: HttpMethod;
   path: `/${string}`;
-  handler(
-    ctx: Context,
-    params: Record<string, string | undefined>,
-  ): Response | Promise<Response>;
+  handler: Handler;
 }
 
 export function buildRoutePath(

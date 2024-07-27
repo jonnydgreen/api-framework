@@ -4,12 +4,8 @@
 
 // TODO: define ourselves
 import type { LevelName, Logger } from "@std/log";
-import { CorePlatformAdapter } from "./platforms/core_adapter.ts";
-import {
-  type Platform,
-  PlatformStrategy,
-  type Server,
-} from "./platforms/platform.ts";
+import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
+import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
 import { ServerContext } from "./logger.ts";
 import { buildKernel, registerClassMethods } from "./kernel.ts";
 import { buildControllerRoutes } from "./router.ts";
@@ -20,7 +16,7 @@ import { ClassType } from "./utils.ts";
  * routes and capabilities to process inbound requests against.
  */
 export class Application {
-  readonly #platform: Readonly<Platform>;
+  readonly #driver: Readonly<Driver>;
   readonly #options: Readonly<ApplicationOptions>;
   readonly #versions = new Map<string, ApplicationVersionOptions>();
 
@@ -34,14 +30,14 @@ export class Application {
     this.log = this.ctx.log;
 
     // TODO: is it best practice to combine a strategy and adapter pattern in this way?
-    const platform = options?.platform ?? PlatformStrategy.Core;
-    switch (platform) {
-      case PlatformStrategy.Core: {
-        this.#platform = new CorePlatformAdapter(this.ctx);
+    const driver = options?.driver ?? DriverStrategy.Core;
+    switch (driver) {
+      case DriverStrategy.Core: {
+        this.#driver = new CoreDriverAdapter(this.ctx);
         break;
       }
       default: {
-        this.#platform = platform;
+        this.#driver = driver;
       }
     }
   }
@@ -71,14 +67,14 @@ export class Application {
           controller,
         );
         for (const route of controllerRoutes) {
-          this.#platform.registerRoute(route);
+          this.#driver.registerRoute(route);
           this.ctx.log.debug(
             `Registered route: ${route.method} ${route.path}`,
           );
         }
       }
     }
-    return this.#platform.listen({
+    return this.#driver.listen({
       ...options,
       port: options?.port ?? 8080,
       hostname: options?.hostname ?? "0.0.0.0",
@@ -90,7 +86,7 @@ export class Application {
  * The Application Options
  */
 export interface ApplicationOptions {
-  platform?: PlatformStrategy | Platform;
+  driver?: DriverStrategy | Driver;
   logLevel?: LevelName;
 }
 
@@ -109,7 +105,7 @@ export interface ApplicationListenOptions {
   /**
    * A literal IP address or host name that can be resolved to an IP address.
    *
-   * __Note about `0.0.0.0`__ While listening `0.0.0.0` works on all platforms,
+   * __Note about `0.0.0.0`__ While listening `0.0.0.0` works on all drivers,
    * the browsers on Windows don't work with the address `0.0.0.0`.
    * As a result, a message of `server running on localhost:8080` instead of
    * `server running on 0.0.0.0:8080` is shown to support Windows.

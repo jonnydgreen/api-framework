@@ -5,11 +5,16 @@
 import { assert } from "@std/assert";
 import type { ApplicationListenOptions } from "../application.ts";
 import { Context, type ServerContext } from "../logger.ts";
-import { handleResponse } from "../response.ts";
+import {
+  buildErrorResponse,
+  processResponse,
+  runHandler,
+} from "../response.ts";
 import type { ControllerRoute } from "../router.ts";
-import type { Platform, Server } from "./platform.ts";
+import type { Driver, Server } from "./driver.ts";
+import { STATUS_CODE, StatusCode } from "jsr:@std/http@^0.224.5/status";
 
-export class CorePlatformAdapter implements Platform {
+export class CoreDriverAdapter implements Driver {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;
   readonly #ctx: ServerContext;
 
@@ -46,10 +51,10 @@ export class CorePlatformAdapter implements Platform {
     }, handler);
   }
 
-  #handler(
+  async #handler(
     request: Request,
     _info: Deno.ServeHandlerInfo,
-  ): Response | Promise<Response> {
+  ): Promise<Response> {
     const ctx = new Context(this.#ctx, request);
     for (const [pathname, methods] of this.#routes) {
       const match = new URLPattern({ pathname }).exec(request.url);
@@ -57,7 +62,8 @@ export class CorePlatformAdapter implements Platform {
         const params = match.pathname.groups;
         const route = methods.get(request.method);
         if (route) {
-          return handleResponse(ctx, route.handler(ctx, params));
+          const response = await runHandler(ctx, route.handler, params);
+          return processResponse(ctx, ...response);
         }
         return this.#notFoundResponse(ctx);
       }
@@ -67,10 +73,12 @@ export class CorePlatformAdapter implements Platform {
 
   #notFoundResponse(ctx: Context): Promise<Response> {
     const { request } = ctx;
-    const body = JSON.stringify({
-      message: `Route ${request.method} ${request.url} not found`,
-    });
-    return handleResponse(ctx, body, { status: 404 });
+    const requestPath = new URL(request.url).pathname;
+    const [body, responseInit] = buildErrorResponse(
+      ctx,
+      new NotFoundError(`Route ${request.method} ${requestPath} not found`),
+    );
+    return processResponse(ctx, body, responseInit);
   }
 
   #onListen({ hostname, port }: Deno.NetAddr): void {
@@ -78,4 +86,14 @@ export class CorePlatformAdapter implements Platform {
       `Listening on: http://${hostname ?? "localhost"}:${port}`,
     );
   }
+}
+
+export class HttpError extends Error {
+  override readonly name = "NotFoundError";
+  readonly statusCode: StatusCode = STATUS_CODE.InternalServerError;
+}
+
+export class NotFoundError extends HttpError {
+  override readonly name = "NotFoundError";
+  override readonly statusCode: StatusCode = STATUS_CODE.NotFound;
 }

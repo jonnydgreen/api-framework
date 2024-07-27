@@ -6,7 +6,7 @@ import type { ApplicationListenOptions } from "../application.ts";
 import type { ControllerRoute } from "../router.ts";
 
 // TODO: docs
-export const enum PlatformStrategy {
+export const enum DriverStrategy {
   Core = "Core",
 }
 
@@ -18,12 +18,12 @@ export interface Server {
 }
 
 /**
- * The Platform Adaptor interface that all adaptors implement.
+ * The Driver Adaptor interface that all adaptors implement.
  *
- * When an option is not supported, a `PlatformNotImplementedError`
+ * When an option is not supported, a `DriverNotImplementedError`
  * will be thrown.
  */
-export interface Platform {
+export interface Driver {
   // TODO: docs
   registerRoute(route: ControllerRoute): void;
   /**
@@ -34,24 +34,24 @@ export interface Platform {
 }
 
 /**
- * Platform Not Implemented Error.
+ * Driver Not Implemented Error.
  *
- * This should be used in any platform adaptor implementation when
+ * This should be used in any driver adaptor implementation when
  * an option is not supported and is used by a user.
  */
-export class PlatformNotImplementedError extends Error {
-  override readonly name = "PlatformNotImplementedError";
-  constructor(options: PlatformNotImplementedErrorOptions) {
+export class DriverNotImplementedError extends Error {
+  override readonly name = "DriverNotImplementedError";
+  constructor(options: DriverNotImplementedErrorOptions) {
     super(options.message);
   }
 }
 
 /**
- * Platform Not Implemented Error Options.
+ * Driver Not Implemented Error Options.
  */
-export interface PlatformNotImplementedErrorOptions {
+export interface DriverNotImplementedErrorOptions {
   /**
-   * The message of the Platform Not Implemented Error Options.
+   * The message of the Driver Not Implemented Error Options.
    */
   message: string;
 }

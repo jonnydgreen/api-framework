@@ -1,9 +1,10 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import { assertEquals } from "@std/assert";
+import { HttpMethod } from "../../router.ts";
 
 const url = new URL("v1/messages", "http://localhost:8080");
-const method = "GET";
+const method = HttpMethod.GET;
 
 console.error(`Calling ${method} ${url}`);
 const response = await fetch(url, { method });

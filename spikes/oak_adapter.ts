@@ -8,11 +8,11 @@
 //   ApplicationListenOptions,
 //   ApplicationVersionOptions,
 // } from "../application.ts";
-// import type { Platform } from "./platform.ts";
+// import type { Driver } from "./driver.ts";
 // import { getControllerRoutes } from "../router.ts";
 // import { assertNever } from "../utils.ts";
 
-// export class OakPlatformAdapter implements Platform {
+// export class OakDriverAdapter implements Driver {
 //   #app: Application;
 
 //   constructor() {
