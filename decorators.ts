@@ -1,6 +1,6 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 import { assert } from "@std/assert";
-import { getClassKey, type Injectable, registerClass } from "./kernel.ts";
+import { getClassKey, type Injectable, registerClass } from "./container.ts";
 import type { ClassType, MaybePromise } from "./utils.ts";
 import { HttpMethod } from "./router.ts";
 

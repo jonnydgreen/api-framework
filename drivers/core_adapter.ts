@@ -4,7 +4,7 @@
 
 import { assert } from "@std/assert";
 import type { ApplicationListenOptions } from "../application.ts";
-import { Context, type ServerContext } from "../logger.ts";
+import { Context, type ServerContext } from "../context.ts";
 import {
   buildErrorResponse,
   processResponse,

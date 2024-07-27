@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 import { calculate } from "@std/http/etag";
 import { STATUS_CODE, STATUS_TEXT, StatusCode } from "@std/http/status";
-import { Context } from "./logger.ts";
+import { Context } from "./context.ts";
 import { Handler } from "./router.ts";
 
 // TODO: handle doc string

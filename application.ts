@@ -6,8 +6,8 @@
 import type { LevelName, Logger } from "@std/log";
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
 import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
-import { ServerContext } from "./logger.ts";
-import { buildKernel, registerClassMethods } from "./kernel.ts";
+import { ServerContext } from "./context.ts";
+import { buildContainer, registerClassMethods } from "./container.ts";
 import { buildControllerRoutes } from "./router.ts";
 import { ClassType } from "./utils.ts";
 
@@ -29,7 +29,6 @@ export class Application {
     this.ctx = new ServerContext(options?.logLevel);
     this.log = this.ctx.log;
 
-    // TODO: is it best practice to combine a strategy and adapter pattern in this way?
     const driver = options?.driver ?? DriverStrategy.Core;
     switch (driver) {
       case DriverStrategy.Core: {
@@ -55,14 +54,14 @@ export class Application {
    * @param options - The required options to start listening for requests.
    */
   public async listen(options?: ApplicationListenOptions): Promise<Server> {
-    // Build kernel to ensure all decorators have been called
+    // Build container to ensure all decorators have been called
     // Once built, register all the routes for each version
-    const kernel = await buildKernel(this.ctx);
+    const container = await buildContainer(this.ctx);
     for (const [version, { controllers }] of this.#versions) {
       for (const controller of controllers) {
-        registerClassMethods(kernel, controller);
+        registerClassMethods(container, controller);
         const controllerRoutes = buildControllerRoutes(
-          kernel,
+          container,
           version,
           controller,
         );

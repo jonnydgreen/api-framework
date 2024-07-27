@@ -3,9 +3,9 @@
 import { assertExists } from "@std/assert";
 import { join } from "@std/path/join";
 import { controllers, routes } from "./decorators.ts";
-import type { Context } from "./logger.ts";
+import type { Context } from "./context.ts";
 import { processResponse } from "./response.ts";
-import { getClassKey, getClassMethod, Kernel } from "./kernel.ts";
+import { Container, getClassKey, getClassMethod } from "./container.ts";
 import type { ClassType, Fn, MaybePromise } from "./utils.ts";
 
 // TODO: doc-strings with full examples
@@ -15,16 +15,8 @@ export type Handler = (
   params: Record<string, string | undefined>,
 ) => MaybePromise<Response | object | BodyInit | null>;
 
-// TODO: move to server context
-// function getRouteHandler(
-//   kernel: Kernel,
-//   controller: ControllerMetadata,
-// ): Handler {
-//   ctx;
-// }
-
 export function buildControllerRoutes(
-  kernel: Kernel,
+  container: Container,
   version: string,
   controller: ClassType,
 ): ControllerRoute[] {
@@ -35,7 +27,7 @@ export function buildControllerRoutes(
   );
   for (const route of filteredRoutes) {
     const routeHandler: Fn = getClassMethod(
-      kernel,
+      container,
       route.controller,
       route.propertyName as string,
     );
@@ -54,7 +46,7 @@ export function buildControllerRoutes(
       // TODO: need serialisation flows here
       async handler(ctx): Promise<Response> {
         const result = await routeHandler(ctx);
-        // TODO: move the below line into handle response
+        // TODO: move the below line into handle response so we can serialise based on content-type
         // TODO: consider having the response as the last thing
         const body = JSON.stringify(result);
         return processResponse(ctx, body, { status: 200 });

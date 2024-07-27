@@ -5,11 +5,11 @@ import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 import { Controller, Get, Service } from "../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../kernel.ts";
+import type { Injectable, InjectableRegistration } from "../container.ts";
 import { HttpMethod } from "../router.ts";
 
 Deno.test({
-  name: "Kernel() hooks up services using dependency injection",
+  name: "Container() hooks up services using dependency injection",
   permissions: setupPermissions(),
   async fn() {
     // Arrange
@@ -29,7 +29,7 @@ Deno.test({
       },
       {
         id: "2",
-        content: "Kernel says hiya",
+        content: "Container says hiya",
       },
     ]);
     await teardownServer(server);
@@ -94,7 +94,7 @@ class MessageRepository implements Injectable, MessageRepositoryContract {
       },
       {
         id: "2",
-        content: "Kernel says hiya",
+        content: "Container says hiya",
       },
     ];
   }

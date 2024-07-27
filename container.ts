@@ -2,17 +2,23 @@
 
 import "npm:reflect-metadata";
 import {
-  Container,
+  Container as InversifyContainer,
   decorate,
   inject,
   injectable,
   interfaces,
 } from "@npm/inversify";
-import { assert, assertExists } from "@std/assert";
-import { assertFunction, type ClassType, type Fn } from "./utils.ts";
-import { ServerContext } from "./logger.ts";
+import { assertExists } from "@std/assert";
+import {
+  assertFunction,
+  type ClassType,
+  type Fn,
+  type MaybePromise,
+} from "./utils.ts";
+import type { ServerContext } from "./context.ts";
 
-export type Kernel = Container;
+// TODO: make our own container
+export type Container = InversifyContainer;
 
 interface IMetadata {
   injectable: Record<string, boolean>;
@@ -29,7 +35,7 @@ function makeInjectable(target: ClassType): void {
 }
 
 export function registerSingleton<T>(
-  container: Kernel,
+  container: Container,
   type: symbol,
   target: ClassType<T>,
   ...types: symbol[]
@@ -82,23 +88,11 @@ export interface InjectableRegistration {
 const registerFnName = "register";
 export interface Injectable {
   // TODO: maybe name to init?
-  register(): InjectableRegistration | Promise<InjectableRegistration>;
-}
-
-export function assertInjectable(
-  target: ClassType,
-): asserts target is ClassType<Injectable> {
-  const descriptor = Object.getOwnPropertyDescriptor(
-    target.prototype,
-    registerFnName,
-  );
-  assert(
-    typeof descriptor?.value === "function",
-    `No registration function ${registerFnName}() defined for injectable: ${target}`,
-  );
+  register(ctx: ServerContext): MaybePromise<InjectableRegistration>;
 }
 
 function getClassRegistration(
+  ctx: ServerContext,
   target: ClassType,
 ): InjectableRegistration | Promise<InjectableRegistration> {
   const descriptor = Object.getOwnPropertyDescriptor(
@@ -109,17 +103,17 @@ function getClassRegistration(
     descriptor?.value,
     `No registration function ${registerFnName}() defined for injectable: ${target}`,
   );
-  return descriptor.value();
+  return descriptor.value(ctx);
 }
 
-export async function buildKernel(ctx: ServerContext): Promise<Kernel> {
-  ctx.log.debug("Building server kernel");
-  const kernel = new Container();
+export async function buildContainer(ctx: ServerContext): Promise<Container> {
+  ctx.log.debug("Building server container");
+  const container = new InversifyContainer();
   for (const [key, target] of classRegistrations.entries()) {
     ctx.log.debug(
-      `Registering ${key.description} in the kernel`,
+      `Registering ${key.description} in the container`,
     );
-    const { ctor } = await getClassRegistration(target);
+    const { ctor } = await getClassRegistration(ctx, target);
     const paramKeys = ctor.map((c, idx) => {
       if (typeof c === "function") {
         return getClassKey(c);
@@ -127,40 +121,40 @@ export async function buildKernel(ctx: ServerContext): Promise<Kernel> {
       if (c.class) {
         return getClassKey(c.class);
       }
-      throw new KernelError(
+      throw new ContainerError(
         `Unable register to register ${key.description}: unsupported parameter definition at position ${idx}`,
       );
     });
-    registerSingleton(kernel, key, target, ...paramKeys);
+    registerSingleton(container, key, target, ...paramKeys);
     ctx.log.debug(
-      `Registered ${key.description} in the kernel`,
+      `Registered ${key.description} in the container`,
     );
   }
-  ctx.log.debug("Built server kernel");
-  return kernel;
+  ctx.log.debug("Built server container");
+  return container;
 }
 
-export class KernelError extends Error {
-  override readonly name = "KernelError";
+export class ContainerError extends Error {
+  override readonly name = "ContainerError";
 }
 
 export function registerClassMethods<T>(
-  kernel: Kernel,
+  container: Container,
   target: ClassType<T>,
 ): void {
   const key = getClassKey(target);
-  kernel.get<T>(key);
+  container.get<T>(key);
 }
 
 export function getClassMethod<T>(
-  kernel: Kernel,
+  container: Container,
   targetKey: symbol,
   propertyName: keyof T,
 ): Fn {
-  const registeredTarget = kernel.get<T>(targetKey);
+  const registeredTarget = container.get<T>(targetKey);
   const fn = registeredTarget[propertyName];
   assertFunction(fn);
   return fn.bind(registeredTarget);
 }
 
-// TODO: move to class
+// TODO: move all bits to a class

@@ -10,7 +10,7 @@ flowchart TD
     O --> D{Custom driver?}
     D -->|yes| V(Register versions)
     D -->|no| DD(Select default driver) --> V
-    V --> K(Build kernel)
+    V --> K(Build container)
     K --> R(Build and register routes in driver)
     R --> E(fa:fa-server Listening)
 ```

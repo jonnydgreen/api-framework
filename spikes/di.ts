@@ -2,7 +2,7 @@
 
 // import "npm:reflect-metadata";
 // import { Container } from "npm:inversify";
-// import { register, Registration } from "../kernel.ts";
+// import { register, Registration } from "../container.ts";
 
 // interface IKatana {
 //   hit(): string;
@@ -51,21 +51,21 @@
 //   },
 // } satisfies Registrations;
 
-// const kernel = new Container();
-// register(kernel, TYPES.Weapon.Katana);
-// register(kernel, TYPES.Weapon.Shuriken);
+// const container = new Container();
+// register(container, TYPES.Weapon.Katana);
+// register(container, TYPES.Weapon.Shuriken);
 // register(
-//   kernel,
+//   container,
 //   TYPES.Warrior.Ninja,
 //   TYPES.Weapon.Katana,
 //   TYPES.Weapon.Shuriken,
 // );
 
-// const ninja = kernel.get<Ninja>(TYPES.Warrior.Ninja.key);
+// const ninja = container.get<Ninja>(TYPES.Warrior.Ninja.key);
 // console.log(ninja, ninja.fight(), ninja.sneak());
 
-// const katana = kernel.get<Katana>(TYPES.Weapon.Katana.key);
+// const katana = container.get<Katana>(TYPES.Weapon.Katana.key);
 // console.log(katana, katana.hit());
 
-// const shuriken = kernel.get<Shuriken>(TYPES.Weapon.Shuriken.key);
+// const shuriken = container.get<Shuriken>(TYPES.Weapon.Shuriken.key);
 // console.log(shuriken, shuriken.throw());

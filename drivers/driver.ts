@@ -5,12 +5,10 @@
 import type { ApplicationListenOptions } from "../application.ts";
 import type { ControllerRoute } from "../router.ts";
 
-// TODO: docs
 export const enum DriverStrategy {
   Core = "Core",
 }
 
-// TODO: doc string
 export interface Server {
   finished: Promise<void>;
   shutdown(): Promise<void>;
@@ -24,7 +22,6 @@ export interface Server {
  * will be thrown.
  */
 export interface Driver {
-  // TODO: docs
   registerRoute(route: ControllerRoute): void;
   /**
    * Start listening for requests, processing registered routes for each request.

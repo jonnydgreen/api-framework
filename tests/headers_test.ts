@@ -5,7 +5,7 @@ import { calculate } from "@std/http/etag";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 import { Controller, Get } from "../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../kernel.ts";
+import type { Injectable, InjectableRegistration } from "../container.ts";
 import { HttpMethod } from "../router.ts";
 
 Deno.test({

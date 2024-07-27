@@ -9,23 +9,3 @@ export function createLogger(levelName: LevelName = "DEBUG"): Logger {
     handlers: [new ConsoleHandler(levelName)],
   });
 }
-
-export class ServerContext {
-  public readonly log: Readonly<Logger>;
-
-  constructor(levelName: LevelName = "DEBUG") {
-    this.log = createLogger(levelName);
-  }
-}
-
-// TODO: move
-export class Context {
-  public readonly log: Readonly<Logger>;
-  public readonly request: Readonly<Request>;
-
-  constructor(ctx: ServerContext, request: Request) {
-    // TODO: create child logger with correlation ID
-    this.log = ctx.log;
-    this.request = request;
-  }
-}
