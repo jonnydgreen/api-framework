@@ -72,7 +72,7 @@ export function getClassKey(target: unknown): symbol {
 }
 
 export interface Registration {
-  class?: Injectable;
+  class?: ClassType<Injectable>;
 }
 
 export interface InjectableRegistration {
@@ -120,11 +120,25 @@ export async function buildKernel(ctx: ServerContext): Promise<Kernel> {
       `Registering ${key.description} in the kernel`,
     );
     const { ctor } = await getClassRegistration(target);
-    const paramKeys = ctor.map((c) => getClassKey(c));
+    const paramKeys = ctor.map((c, idx) => {
+      if (typeof c === "function") {
+        return getClassKey(c);
+      }
+      if (c.class) {
+        return getClassKey(c.class);
+      }
+      throw new KernelError(
+        `Unable register to register ${key.description}: unsupported parameter definition at position ${idx}`,
+      );
+    });
     register(kernel, key, target, ...paramKeys);
   }
   ctx.log.debug("Built server kernel");
   return kernel;
+}
+
+export class KernelError extends Error {
+  override readonly name = "KernelError";
 }
 
 export function registerClassMethods<T>(

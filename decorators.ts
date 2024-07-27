@@ -19,6 +19,16 @@ export function Controller(path: `/${string}`) {
   return controllerDecorator;
 }
 
+export function Service() {
+  function serviceDecorator(
+    target: ClassType<Injectable>,
+    _context: ClassDecoratorContext,
+  ): void {
+    registerClass(target);
+  }
+  return serviceDecorator;
+}
+
 export interface GetOptions<R> {
   path: `/${string}`;
 }

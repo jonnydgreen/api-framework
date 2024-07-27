@@ -8,7 +8,7 @@ export async function setupApplication(controllers: ClassType[]): Promise<[
   server: Server,
   origin: URL,
 ]> {
-  const app = new Application({ logLevel: "DEBUG" });
+  const app = new Application({ logLevel: "CRITICAL" });
 
   app.registerVersion({
     version: "v1",
