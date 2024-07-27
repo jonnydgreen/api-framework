@@ -5,12 +5,37 @@ import { join } from "@std/path/join";
 import { controllers, routes } from "./decorators.ts";
 import type { Context } from "./logger.ts";
 import { handleResponse } from "./response.ts";
+import { getClassKey, getClassMethod, Kernel } from "./kernel.ts";
+import type { ClassType, Fn } from "./utils.ts";
 
 // TODO: doc-strings with full examples
 
-export function getControllerRoutes(_controller: unknown): ControllerRoute[] {
+export type Handler = (ctx: Context) => Promise<unknown>;
+
+// TODO: move to server context
+// function getRouteHandler(
+//   kernel: Kernel,
+//   controller: ControllerMetadata,
+// ): Handler {
+//   ctx;
+// }
+
+export function buildControllerRoutes(
+  kernel: Kernel,
+  version: string,
+  controller: ClassType,
+): ControllerRoute[] {
   const controllerRoutes: ControllerRoute[] = [];
-  routes.forEach((route) => {
+  const controllerKey = getClassKey(controller);
+  const filteredRoutes = [...routes.values()].filter((route) =>
+    route.controller === controllerKey
+  );
+  for (const route of filteredRoutes) {
+    const routeHandler: Fn = getClassMethod(
+      kernel,
+      route.controller,
+      route.propertyName as string,
+    );
     const controller = controllers.get(route.controller);
     assertExists(
       controller,
@@ -20,19 +45,19 @@ export function getControllerRoutes(_controller: unknown): ControllerRoute[] {
     );
     controllerRoutes.push({
       method: route.method,
-      path: buildRoutePath(controller.path, route.path),
+      path: buildRoutePath(version, controller.path, route.path),
       // TODO: maybe do this elsewhere and leave the handler largely as is
       // TODO: don't always make a promise
       // TODO: need serialisation flows here
       async handler(ctx): Promise<Response> {
-        const result = await route.handler();
+        const result = await routeHandler(ctx);
         // TODO: move the below line into handle response
         // TODO: consider having the response as the last thing
         const body = JSON.stringify(result);
         return handleResponse(ctx, body, { status: 200 });
       },
     });
-  });
+  }
   return controllerRoutes;
 }
 
@@ -47,8 +72,22 @@ export interface ControllerRoute {
   ): Response | Promise<Response>;
 }
 
-export function buildRoutePath(...paths: string[]): `/${string}` {
-  const pathname = join(...paths).replaceAll("\\", "/").replace(/\/+$/, "")
+export interface ControllerRoute {
+  method: HttpMethod;
+  path: `/${string}`;
+  handler(
+    ctx: Context,
+    params: Record<string, string | undefined>,
+  ): Response | Promise<Response>;
+}
+
+export function buildRoutePath(
+  ...paths: string[]
+): `/${string}` {
+  const pathname = join("/", ...paths).replaceAll("\\", "/").replace(
+    /\/+$/,
+    "",
+  )
     .replace(
       /^\/+/,
       "/",

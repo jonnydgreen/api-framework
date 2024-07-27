@@ -1,16 +1,18 @@
-// Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
+// // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import { assertStrictEquals } from "@std/assert";
 import { calculate } from "@std/http/etag";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
+import { Controller, Get } from "../decorators.ts";
+import type { Injectable, InjectableRegistration } from "../kernel.ts";
 
 Deno.test({
   name: "Headers returns an etag matching the response body",
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = setupApplication();
+    const [, server, origin] = await setupApplication([MessageController]);
     const url = new URL("/v1/messages", origin);
 
     // Act
@@ -25,3 +27,24 @@ Deno.test({
     await teardownServer(server);
   },
 });
+
+@Controller("/messages")
+class MessageController implements Injectable {
+  public register(): InjectableRegistration {
+    return { ctor: [] };
+  }
+
+  @Get({ path: "/" })
+  public getMessages() {
+    return [
+      {
+        id: "1",
+        content: "Hello",
+      },
+      {
+        id: "2",
+        content: "Hiya",
+      },
+    ];
+  }
+}

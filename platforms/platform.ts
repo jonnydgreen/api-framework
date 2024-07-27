@@ -2,10 +2,8 @@
 
 // TODO: doc-strings with full examples
 
-import type {
-  ApplicationListenOptions,
-  ApplicationVersionOptions,
-} from "../application.ts";
+import type { ApplicationListenOptions } from "../application.ts";
+import type { ControllerRoute } from "../router.ts";
 
 // TODO: docs
 export const enum PlatformStrategy {
@@ -26,11 +24,8 @@ export interface Server {
  * will be thrown.
  */
 export interface Platform {
-  /**
-   * Register a version of an API.
-   * @param options - The required options to register an API version.
-   */
-  registerVersion(options: Required<ApplicationVersionOptions>): void;
+  // TODO: docs
+  registerRoute(route: ControllerRoute): void;
   /**
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.

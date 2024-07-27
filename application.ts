@@ -11,6 +11,9 @@ import {
   type Server,
 } from "./platforms/platform.ts";
 import { ServerContext } from "./logger.ts";
+import { buildKernel, registerClassMethods } from "./kernel.ts";
+import { buildControllerRoutes } from "./router.ts";
+import { ClassType } from "./utils.ts";
 
 /**
  * A class which starts the API applications and allows one to register
@@ -19,6 +22,7 @@ import { ServerContext } from "./logger.ts";
 export class Application {
   readonly #platform: Readonly<Platform>;
   readonly #options: Readonly<ApplicationOptions>;
+  readonly #versions = new Map<string, ApplicationVersionOptions>();
 
   public readonly ctx: Readonly<ServerContext>;
 
@@ -47,14 +51,33 @@ export class Application {
    * @param options - The required options to register an API version.
    */
   public registerVersion(options: ApplicationVersionOptions): void {
-    this.#platform.registerVersion(options);
+    this.#versions.set(options.version, options);
   }
 
   /**
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
    */
-  public listen(options?: ApplicationListenOptions): Server {
+  public async listen(options?: ApplicationListenOptions): Promise<Server> {
+    // Build kernel to ensure all decorators have been called
+    // Once built, register all the routes for each version
+    const kernel = await buildKernel(this.ctx);
+    for (const [version, { controllers }] of this.#versions) {
+      for (const controller of controllers) {
+        registerClassMethods(kernel, controller);
+        const controllerRoutes = buildControllerRoutes(
+          kernel,
+          version,
+          controller,
+        );
+        for (const route of controllerRoutes) {
+          this.#platform.registerRoute(route);
+          this.ctx.log.debug(
+            `Registered route: ${route.method} ${route.path}`,
+          );
+        }
+      }
+    }
     return this.#platform.listen({
       ...options,
       port: options?.port ?? 8080,
@@ -120,5 +143,5 @@ export interface ApplicationVersionOptions {
    * a controller route of `/properties` is registered, then the application route
    * will be `/v1/properties` when the version is `v1`.
    */
-  controllers: unknown[];
+  controllers: ClassType[];
 }

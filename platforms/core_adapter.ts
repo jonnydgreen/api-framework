@@ -3,17 +3,10 @@
 // TODO: doc-strings with full examples
 
 import { assert } from "@std/assert";
-import type {
-  ApplicationListenOptions,
-  ApplicationVersionOptions,
-} from "../application.ts";
-import { Context, ServerContext } from "../logger.ts";
+import type { ApplicationListenOptions } from "../application.ts";
+import { Context, type ServerContext } from "../logger.ts";
 import { handleResponse } from "../response.ts";
-import {
-  buildRoutePath,
-  type ControllerRoute,
-  getControllerRoutes,
-} from "../router.ts";
+import type { ControllerRoute } from "../router.ts";
 import type { Platform, Server } from "./platform.ts";
 
 export class CorePlatformAdapter implements Platform {
@@ -25,27 +18,19 @@ export class CorePlatformAdapter implements Platform {
     this.#ctx = ctx;
   }
 
-  public registerVersion(options: Required<ApplicationVersionOptions>): void {
-    const prefix = `/${options.version}`;
-    for (const controller of options.controllers) {
-      const routes = getControllerRoutes(controller);
-      for (const route of routes) {
-        const routePath = buildRoutePath(prefix, route.path);
-        const methods = this.#routes.get(routePath);
-        if (methods) {
-          const routeDetails = methods.get(route.method);
-          assert(
-            !routeDetails,
-            `Route ${route.method} ${routePath} already registered`,
-          );
-          methods.set(route.method, route);
-        } else {
-          const routeDetails = new Map<string, ControllerRoute>();
-          routeDetails.set(route.method, route);
-          this.#routes.set(routePath, routeDetails);
-        }
-        this.#ctx.log.debug(`Registered route: ${route.method} ${routePath}`);
-      }
+  public registerRoute(route: ControllerRoute): void {
+    const methods = this.#routes.get(route.path);
+    if (methods) {
+      const routeDetails = methods.get(route.method);
+      assert(
+        !routeDetails,
+        `Route ${route.method} ${route.path} already registered`,
+      );
+      methods.set(route.method, route);
+    } else {
+      const routeDetails = new Map<string, ControllerRoute>();
+      routeDetails.set(route.method, route);
+      this.#routes.set(route.path, routeDetails);
     }
   }
 

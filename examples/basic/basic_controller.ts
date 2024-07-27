@@ -1,9 +1,14 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import { Controller, Get } from "../../decorators.ts";
+import type { Injectable, InjectableRegistration } from "../../kernel.ts";
 
 @Controller("/messages")
-export class MessageController {
+export class MessageController implements Injectable {
+  register(): InjectableRegistration {
+    return { ctor: [] };
+  }
+
   // TODO: uncomment
   // @Get({ responseType: List(Message) })
   @Get({ path: "/" })
@@ -21,9 +26,3 @@ export class MessageController {
     ];
   }
 }
-
-// TODO: fine for now
-// This is here because it triggers the decorator instantiations
-// which is needs to set everything up
-// deno-lint-ignore no-unused-vars
-const m = new MessageController();
