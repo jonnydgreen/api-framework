@@ -8,7 +8,7 @@ import { createLogger } from "./logger.ts";
 export class ServerContext {
   public readonly log: Readonly<Logger>;
 
-  constructor(levelName: LevelName = "DEBUG") {
+  constructor(levelName: LevelName) {
     this.log = createLogger(levelName);
   }
 }

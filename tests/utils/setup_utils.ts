@@ -16,14 +16,18 @@ export async function setupApplication(controllers: ClassType[]): Promise<[
   });
 
   const server = await app.listen({ port: 0 });
-  const origin = new URL(`http://${server.addr.hostname}:${server.addr.port}`);
+  const origin = buildServerOrigin(server);
   return [app, server, origin];
+}
+
+export function buildServerOrigin(server: Server): URL {
+  return new URL(`http://${server.addr.hostname}:${server.addr.port}`);
 }
 
 export function setupPermissions(
   options?: Deno.PermissionOptionsObject,
 ): Deno.PermissionOptionsObject {
-  const baseNetPermissions = ["0.0.0.0", "localhost"];
+  const baseNetPermissions = ["0.0.0.0", "localhost", "127.0.0.1"];
   const netPermissions = options?.net
     ? Array.isArray(options.net)
       ? [...options.net, ...baseNetPermissions]

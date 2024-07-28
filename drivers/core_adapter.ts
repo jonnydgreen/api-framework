@@ -83,7 +83,7 @@ export class CoreDriverAdapter implements Driver {
 
   #onListen({ hostname, port }: Deno.NetAddr): void {
     this.#ctx.log.info(
-      `Listening on: http://${hostname ?? "localhost"}:${port}`,
+      `Listening on: http://${hostname}:${port}`,
     );
   }
 }

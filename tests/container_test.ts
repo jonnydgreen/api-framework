@@ -1,15 +1,21 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assertEquals, assertStrictEquals } from "@std/assert";
+import { assertEquals, assertRejects, assertStrictEquals } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 import { Controller, Get, Service } from "../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../container.ts";
+import {
+  clearRegistration,
+  ContainerError,
+  type Injectable,
+  type InjectableRegistration,
+} from "../container.ts";
 import { HttpMethod } from "../router.ts";
+import { MaybePromise } from "../utils.ts";
 
 Deno.test({
-  name: "Container() hooks up services using dependency injection",
+  name: "buildContainer() hooks up services using dependency injection",
   permissions: setupPermissions(),
   async fn() {
     // Arrange
@@ -33,6 +39,32 @@ Deno.test({
       },
     ]);
     await teardownServer(server);
+  },
+});
+
+Deno.test({
+  name:
+    "buildContainer() throws a startup error when an unsupported registration is defined",
+  permissions: setupPermissions(),
+  async fn() {
+    // Arrange
+    @Controller("/unsupported")
+    class UnsupportedController implements Injectable {
+      public register(): MaybePromise<InjectableRegistration> {
+        return {
+          // deno-lint-ignore no-explicit-any
+          ctor: [{ unsupported: "blah" } as any],
+        };
+      }
+    }
+
+    // Act & Assert
+    await assertRejects(
+      () => setupApplication([UnsupportedController]),
+      ContainerError,
+      `Unable to register UnsupportedController: unsupported parameter definition at position 0`,
+    );
+    clearRegistration(UnsupportedController);
   },
 });
 

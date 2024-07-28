@@ -17,9 +17,6 @@ export interface Server {
 
 /**
  * The Driver Adaptor interface that all adaptors implement.
- *
- * When an option is not supported, a `DriverNotImplementedError`
- * will be thrown.
  */
 export interface Driver {
   registerRoute(route: ControllerRoute): void;
@@ -28,19 +25,6 @@ export interface Driver {
    * @param options - The required options to start listening for requests.
    */
   listen(options: Required<ApplicationListenOptions>): Server;
-}
-
-/**
- * Driver Not Implemented Error.
- *
- * This should be used in any driver adaptor implementation when
- * an option is not supported and is used by a user.
- */
-export class DriverNotImplementedError extends Error {
-  override readonly name = "DriverNotImplementedError";
-  constructor(options: DriverNotImplementedErrorOptions) {
-    super(options.message);
-  }
 }
 
 /**

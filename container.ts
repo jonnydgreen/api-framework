@@ -56,6 +56,10 @@ export function registerSingleton<T>(
 }
 
 const classRegistrations = new Map<symbol, ClassType>();
+export function clearRegistration<T>(target: ClassType<T>): void {
+  const key = getClassKey(target);
+  classRegistrations.delete(key);
+}
 
 const typeKey = Symbol("api.type.key");
 export function registerClass<Class extends ClassType>(
@@ -115,14 +119,11 @@ export async function buildContainer(ctx: ServerContext): Promise<Container> {
     );
     const { ctor } = await getClassRegistration(ctx, target);
     const paramKeys = ctor.map((c, idx) => {
-      if (typeof c === "function") {
-        return getClassKey(c);
-      }
       if (c.class) {
         return getClassKey(c.class);
       }
       throw new ContainerError(
-        `Unable register to register ${key.description}: unsupported parameter definition at position ${idx}`,
+        `Unable to register ${key.description}: unsupported parameter definition at position ${idx}`,
       );
     });
     registerSingleton(container, key, target, ...paramKeys);

@@ -4,10 +4,6 @@
 
 import { assert } from "@std/assert";
 
-export function assertNever(_input: never, message: string): never {
-  throw new Error(message);
-}
-
 export function assertFunction(
   input: unknown,
   msg?: string,

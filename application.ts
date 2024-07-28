@@ -16,8 +16,8 @@ import { ClassType } from "./utils.ts";
  * routes and capabilities to process inbound requests against.
  */
 export class Application {
+  readonly options: Readonly<ApplicationOptions>;
   readonly #driver: Readonly<Driver>;
-  readonly #options: Readonly<ApplicationOptions>;
   readonly #versions = new Map<string, ApplicationVersionOptions>();
 
   public readonly ctx: Readonly<ServerContext>;
@@ -25,11 +25,22 @@ export class Application {
   public readonly log: Readonly<Logger>;
 
   constructor(options?: ApplicationOptions) {
-    this.#options = options ?? {};
-    this.ctx = new ServerContext(options?.logLevel);
-    this.log = this.ctx.log;
+    // Driver
+    const defaultDriver = DriverStrategy.Core;
+    const driver = options?.driver ?? defaultDriver;
 
-    const driver = options?.driver ?? DriverStrategy.Core;
+    // Log level
+    const defaultLogLevel: LevelName = "DEBUG";
+    const logLevel: LevelName = options?.logLevel ?? defaultLogLevel;
+
+    // Setup
+    const defaultOptions: Required<ApplicationOptions> = {
+      driver: defaultDriver,
+      logLevel: defaultLogLevel,
+    };
+    this.options = { ...defaultOptions, ...options };
+    this.ctx = new ServerContext(logLevel);
+    this.log = this.ctx.log;
     switch (driver) {
       case DriverStrategy.Core: {
         this.#driver = new CoreDriverAdapter(this.ctx);
