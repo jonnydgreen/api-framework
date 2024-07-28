@@ -22,7 +22,10 @@ export function Controller(path: `/${string}`) {
   return controllerDecorator;
 }
 
-export function Service() {
+export function Service(): (
+  target: ClassType<Injectable>,
+  _context: ClassDecoratorContext,
+) => void {
   function serviceDecorator(
     target: ClassType<Injectable>,
     _context: ClassDecoratorContext,

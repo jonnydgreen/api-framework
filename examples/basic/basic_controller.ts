@@ -2,6 +2,7 @@
 
 import { Controller, Get } from "../../decorators.ts";
 import type { Injectable, InjectableRegistration } from "../../container.ts";
+import { Message } from "./basic_model.ts";
 
 @Controller("/messages")
 export class MessageController implements Injectable {
@@ -12,8 +13,7 @@ export class MessageController implements Injectable {
   // TODO: uncomment
   // @Get({ responseType: List(Message) })
   @Get({ path: "/" })
-  // public getMessages(): Message[] {
-  public getMessages() {
+  public getMessages(): Message[] {
     return [
       {
         id: "1",

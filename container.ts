@@ -71,7 +71,7 @@ export function registerClass<Class extends ClassType>(
   return key;
 }
 export function getClassKey(target: unknown): symbol {
-  const key = (target as Record<symbol, symbol | undefined>)[typeKey];
+  const key = maybeGetClassKey(target);
   assertExists(
     key,
     `Cannot get class key: ${
@@ -79,6 +79,10 @@ export function getClassKey(target: unknown): symbol {
     } has not been registered`,
   );
   return key;
+}
+
+export function maybeGetClassKey(target: unknown): symbol | undefined {
+  return (target as Record<symbol, symbol | undefined>)[typeKey];
 }
 
 export interface Registration {
