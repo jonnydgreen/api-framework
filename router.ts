@@ -5,8 +5,9 @@ import { join } from "@std/path/join";
 import { controllers, routes } from "./decorators.ts";
 import type { Context } from "./context.ts";
 import { processResponse } from "./response.ts";
-import { Container, getClassKey, getClassMethod } from "./container.ts";
+import { Container, getContainerClassMethod } from "./container.ts";
 import type { ClassType, Fn, MaybePromise } from "./utils.ts";
+import { getClassKey } from "./registration.ts";
 
 // TODO: doc-strings with full examples
 
@@ -26,7 +27,7 @@ export function buildControllerRoutes(
     route.controller === controllerKey
   );
   for (const route of filteredRoutes) {
-    const routeHandler: Fn = getClassMethod(
+    const routeHandler: Fn = getContainerClassMethod(
       container,
       route.controller,
       route.propertyName as string,

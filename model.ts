@@ -2,7 +2,11 @@
 
 import * as z from "@x/zod";
 import { ClassType, Fn } from "./utils.ts";
-import { getClassKey, maybeGetClassKey, registerClass } from "./container.ts";
+import {
+  getClassKey,
+  maybeGetClassKey,
+  registerClass,
+} from "./registration.ts";
 import { assertExists } from "@std/assert";
 
 // TODO: doc string

@@ -3,13 +3,15 @@
 import {
   assertEquals,
   assertInstanceOf,
+  AssertionError,
   assertRejects,
   assertStrictEquals,
+  assertThrows,
 } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { Logger } from "@std/log";
 import { Application } from "../application.ts";
-import type { Injectable, InjectableRegistration } from "../container.ts";
+import type { Injectable, InjectableRegistration } from "../registration.ts";
 import { ServerContext } from "../context.ts";
 import { Controller, Get } from "../decorators.ts";
 import { HttpMethod } from "../router.ts";
@@ -28,11 +30,11 @@ Deno.test({
     // Assert
     assertEquals(app.options, {
       driver: DriverStrategy.Core,
-      logLevel: "DEBUG",
+      logLevel: "INFO",
     });
     assertInstanceOf(app.ctx, ServerContext);
     assertInstanceOf(app.log, Logger);
-    assertStrictEquals(app.log.levelName, "DEBUG");
+    assertStrictEquals(app.log.levelName, "INFO");
   },
 });
 
@@ -56,7 +58,7 @@ Deno.test({
     const response = await fetch(url, { method: HttpMethod.GET });
 
     // Assert
-    assertEquals(app.options, { driver: customDriver, logLevel: "DEBUG" });
+    assertEquals(app.options, { driver: customDriver, logLevel: "INFO" });
     assertStrictEquals(response.status, STATUS_CODE.OK);
     assertStrictEquals(response.statusText, STATUS_TEXT[STATUS_CODE.OK]);
     assertEquals(await response.json(), [
@@ -70,6 +72,22 @@ Deno.test({
       },
     ]);
     await teardownServer(server);
+  },
+});
+
+Deno.test({
+  name: "Application() throw an error for an unsupported driver",
+  permissions: setupPermissions(),
+  fn() {
+    // Arrange
+    const driver = "unsupported" as DriverStrategy;
+
+    // Act & Assert
+    assertThrows(
+      () => new Application({ driver }),
+      AssertionError,
+      `Unsupported driver: ${driver}`,
+    );
   },
 });
 

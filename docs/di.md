@@ -24,6 +24,17 @@ Based on the above it is recommend to use our own DI container solution.
   - Makes code generation a reality
   - Avoid black-box magic where possible
 
+Why use dependency injection?
+
+<!-- TODO: links and verify that this isn't nonsense.  -->
+
+When developing services, it is good practice to use
+[SOLID principles](https://en.wikipedia.org/wiki/SOLID) for the software
+architecture. A big part of this is dependency injection which allows one to
+define all the required dependencies for a service across the entire stack. As
+part of this, software can be defined in a way that can scale in the future
+while keeping things simple in the short and long-term.
+
 A common issue with dependency injection is the magic nature of how it's set up.
 Here we aim to rectify this by keeping any registrations of entities within the
 container as close to the relevant definitions as possible. This can be achieved
@@ -34,7 +45,7 @@ container:
 - `@Controller()`
 - `@Service()`
 
-For example, as controller can be registered as follows:
+For example, a controller can be defined as follows:
 
 ```ts
 @Controller("/messages")
@@ -45,7 +56,7 @@ export class MessageController implements Injectable {
   // and mandated by the presence of the Controller decorator.
   // As a function, users retain full flexibility for
   // registration of dependencies.
-  public init(): InjectableInit {
+  public register(): InjectableRegistration {
     return { ctor: [MessageService] };
   }
 
@@ -65,7 +76,18 @@ export class MessageController implements Injectable {
 }
 ```
 
-Similarly, a service can be registered as follows:
+It is then registered as part of an application version as follows:
+
+```ts
+const app = new Application();
+
+app.registerVersion({
+  version: "v1",
+  controllers: [MessageController],
+});
+```
+
+Similarly, a service can be defined as follows:
 
 ```ts
 @Service()

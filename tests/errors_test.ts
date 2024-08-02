@@ -5,7 +5,7 @@ import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 import { Controller, Get } from "../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../container.ts";
+import type { Injectable, InjectableRegistration } from "../registration.ts";
 import { ErrorResponse } from "../response.ts";
 import { HttpMethod } from "../router.ts";
 

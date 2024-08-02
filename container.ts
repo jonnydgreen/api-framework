@@ -8,14 +8,13 @@ import {
   injectable,
   interfaces,
 } from "@npm/inversify";
-import { assertExists } from "@std/assert";
-import {
-  assertFunction,
-  type ClassType,
-  type Fn,
-  type MaybePromise,
-} from "./utils.ts";
+import { assertFunction, type ClassType, type Fn } from "./utils.ts";
 import type { ServerContext } from "./context.ts";
+import {
+  getClassKey,
+  getClassRegistration,
+  getClassRegistrations,
+} from "./registration.ts";
 
 // TODO: make our own container
 export type Container = InversifyContainer;
@@ -55,69 +54,10 @@ export function registerSingleton<T>(
   return container.bind<T>(type).to(target).inSingletonScope();
 }
 
-const classRegistrations = new Map<symbol, ClassType>();
-export function clearRegistration<T>(target: ClassType<T>): void {
-  const key = getClassKey(target);
-  classRegistrations.delete(key);
-}
-
-const typeKey = Symbol("api.type.key");
-export function registerClass<Class extends ClassType>(
-  target: Class,
-): symbol {
-  const key = Symbol(target.name);
-  Object.assign(target, { [typeKey]: key });
-  classRegistrations.set(key, target);
-  return key;
-}
-export function getClassKey(target: unknown): symbol {
-  const key = maybeGetClassKey(target);
-  assertExists(
-    key,
-    `Cannot get class key: ${
-      (target as ClassType).name
-    } has not been registered`,
-  );
-  return key;
-}
-
-export function maybeGetClassKey(target: unknown): symbol | undefined {
-  return (target as Record<symbol, symbol | undefined>)[typeKey];
-}
-
-export interface Registration {
-  class?: ClassType<Injectable>;
-}
-
-export interface InjectableRegistration {
-  ctor: Registration[];
-}
-
-const registerFnName = "register";
-export interface Injectable {
-  // TODO: maybe name to init?
-  register(ctx: ServerContext): MaybePromise<InjectableRegistration>;
-}
-
-function getClassRegistration(
-  ctx: ServerContext,
-  target: ClassType,
-): InjectableRegistration | Promise<InjectableRegistration> {
-  const descriptor = Object.getOwnPropertyDescriptor(
-    target.prototype,
-    registerFnName,
-  );
-  assertFunction(
-    descriptor?.value,
-    `No registration function ${registerFnName}() defined for injectable: ${target}`,
-  );
-  return descriptor.value(ctx);
-}
-
 export async function buildContainer(ctx: ServerContext): Promise<Container> {
   ctx.log.debug("Building server container");
   const container = new InversifyContainer();
-  for (const [key, target] of classRegistrations.entries()) {
+  for (const [key, target] of getClassRegistrations()) {
     ctx.log.debug(
       `Registering ${key.description} in the container`,
     );
@@ -143,7 +83,7 @@ export class ContainerError extends Error {
   override readonly name = "ContainerError";
 }
 
-export function registerClassMethods<T>(
+export function registerContainerClassMethods<T>(
   container: Container,
   target: ClassType<T>,
 ): void {
@@ -151,7 +91,7 @@ export function registerClassMethods<T>(
   container.get<T>(key);
 }
 
-export function getClassMethod<T>(
+export function getContainerClassMethod<T>(
   container: Container,
   targetKey: symbol,
   propertyName: keyof T,

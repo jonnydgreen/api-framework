@@ -2,7 +2,14 @@
 
 // TODO: refine docs and error
 
-import { assert } from "@std/assert";
+import { assert, AssertionError } from "@std/assert";
+
+export function assertNever(
+  _input: never,
+  msg: string,
+): never {
+  throw new AssertionError(msg);
+}
 
 export function assertFunction(
   input: unknown,

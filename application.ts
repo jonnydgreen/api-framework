@@ -7,9 +7,9 @@ import type { LevelName, Logger } from "@std/log";
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
 import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
 import { ServerContext } from "./context.ts";
-import { buildContainer, registerClassMethods } from "./container.ts";
+import { buildContainer, registerContainerClassMethods } from "./container.ts";
 import { buildControllerRoutes } from "./router.ts";
-import { ClassType } from "./utils.ts";
+import { assertNever, ClassType } from "./utils.ts";
 
 /**
  * A class which starts the API applications and allows one to register
@@ -30,7 +30,7 @@ export class Application {
     const driver = options?.driver ?? defaultDriver;
 
     // Log level
-    const defaultLogLevel: LevelName = "DEBUG";
+    const defaultLogLevel: LevelName = "INFO";
     const logLevel: LevelName = options?.logLevel ?? defaultLogLevel;
 
     // Setup
@@ -41,15 +41,7 @@ export class Application {
     this.options = { ...defaultOptions, ...options };
     this.ctx = new ServerContext(logLevel);
     this.log = this.ctx.log;
-    switch (driver) {
-      case DriverStrategy.Core: {
-        this.#driver = new CoreDriverAdapter(this.ctx);
-        break;
-      }
-      default: {
-        this.#driver = driver;
-      }
-    }
+    this.#driver = this.#setupDriver(driver);
   }
 
   /**
@@ -70,7 +62,7 @@ export class Application {
     const container = await buildContainer(this.ctx);
     for (const [version, { controllers }] of this.#versions) {
       for (const controller of controllers) {
-        registerClassMethods(container, controller);
+        registerContainerClassMethods(container, controller);
         const controllerRoutes = buildControllerRoutes(
           container,
           version,
@@ -89,6 +81,20 @@ export class Application {
       port: options?.port ?? 8080,
       hostname: options?.hostname ?? "0.0.0.0",
     });
+  }
+
+  #setupDriver(driver: Driver | DriverStrategy): Driver {
+    if (typeof driver === "object") {
+      return driver;
+    }
+    switch (driver) {
+      case DriverStrategy.Core: {
+        return new CoreDriverAdapter(this.ctx);
+      }
+      default: {
+        assertNever(driver, `Unsupported driver: ${driver}`);
+      }
+    }
   }
 }
 

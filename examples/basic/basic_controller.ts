@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import { Controller, Get } from "../../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../../container.ts";
+import type { Injectable, InjectableRegistration } from "../../registration.ts";
 import { Message } from "./basic_model.ts";
 
 @Controller("/messages")

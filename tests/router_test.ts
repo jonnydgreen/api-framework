@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import { assertRejects } from "@std/assert";
-import type { Injectable, InjectableRegistration } from "../container.ts";
+import type { Injectable, InjectableRegistration } from "../registration.ts";
 import { Controller, Get } from "../decorators.ts";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 
