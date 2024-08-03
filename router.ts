@@ -2,17 +2,16 @@
 
 import { assert, assertExists } from "@std/assert";
 import { join } from "@std/path/join";
-import { controllers, RouteMetadata, routes } from "./decorators.ts";
-import type { Context, ServerContext } from "./context.ts";
 import { Container, getContainerClassMethod } from "./container.ts";
-import type { ClassType, Fn, MaybePromise } from "./utils.ts";
+import type { Context } from "./context.ts";
+import { controllers, RouteMetadata, routes } from "./decorators.ts";
 import {
   ClassRegistrationType,
   getClassKey,
-  getClassRegistration,
   getRegisteredClass,
 } from "./registration.ts";
 import { buildErrorResponse, processResponse } from "./response.ts";
+import type { ClassType, MaybePromise } from "./utils.ts";
 
 // TODO: doc-strings with full examples
 
