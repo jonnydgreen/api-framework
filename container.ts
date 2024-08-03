@@ -11,6 +11,7 @@ import {
 import { assertFunction, type ClassType, type Fn } from "./utils.ts";
 import type { ServerContext } from "./context.ts";
 import {
+  ClassRegistrationType,
   getClassKey,
   getClassRegistration,
   getClassRegistrations,
@@ -57,7 +58,11 @@ export function registerSingleton<T>(
 export async function buildContainer(ctx: ServerContext): Promise<Container> {
   ctx.log.debug("Building server container");
   const container = new InversifyContainer();
-  for (const [key, target] of getClassRegistrations()) {
+  for (
+    const [key, { target }] of getClassRegistrations(
+      ClassRegistrationType.Injectable,
+    )
+  ) {
     ctx.log.debug(
       `Registering ${key.description} in the container`,
     );

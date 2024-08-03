@@ -1,19 +1,25 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assertExists } from "@std/assert";
+import { assert, assertExists } from "@std/assert";
 import { join } from "@std/path/join";
-import { controllers, routes } from "./decorators.ts";
-import type { Context } from "./context.ts";
-import { processResponse } from "./response.ts";
+import { controllers, RouteMetadata, routes } from "./decorators.ts";
+import type { Context, ServerContext } from "./context.ts";
 import { Container, getContainerClassMethod } from "./container.ts";
 import type { ClassType, Fn, MaybePromise } from "./utils.ts";
-import { getClassKey } from "./registration.ts";
+import {
+  ClassRegistrationType,
+  getClassKey,
+  getClassRegistration,
+  getRegisteredClass,
+} from "./registration.ts";
+import { buildErrorResponse, processResponse } from "./response.ts";
 
 // TODO: doc-strings with full examples
 
 export type Handler = (
   ctx: Context,
   params: Record<string, string | undefined>,
+  body: Record<string, unknown> | undefined,
 ) => MaybePromise<Response | object | BodyInit | null>;
 
 export function buildControllerRoutes(
@@ -27,7 +33,7 @@ export function buildControllerRoutes(
     route.controller === controllerKey
   );
   for (const route of filteredRoutes) {
-    const routeHandler: Fn = getContainerClassMethod(
+    const routeHandler = getContainerClassMethod(
       container,
       route.controller,
       route.propertyName as string,
@@ -42,19 +48,57 @@ export function buildControllerRoutes(
     controllerRoutes.push({
       method: route.method,
       path: buildRoutePath(version, controller.path, route.path),
-      // TODO: maybe do this elsewhere and leave the handler largely as is
-      // TODO: don't always make a promise
-      // TODO: need serialisation flows here
-      async handler(ctx): Promise<Response> {
-        const result = await routeHandler(ctx);
-        // TODO: move the below line into handle response so we can serialise based on content-type
-        // TODO: consider having the response as the last thing
-        const body = JSON.stringify(result);
-        return processResponse(ctx, body, { status: 200 });
-      },
+      handler: buildHandler(route, routeHandler),
     });
   }
   return controllerRoutes;
+}
+
+function buildHandler(
+  route: RouteMetadata,
+  handler: Handler,
+): ControllerRouteHandler {
+  let bodyClass: ClassType | undefined = undefined;
+  if (route.body) {
+    const registeredClass = getRegisteredClass(route.body);
+    assert(
+      registeredClass.type === ClassRegistrationType.InputType,
+      `Registered class for key ${
+        String(route.body)
+      } is not registered as an InputType`,
+    );
+    bodyClass = registeredClass.target;
+  }
+
+  return async function runHandler(
+    ctx: Context,
+    params: Record<string, string | undefined>,
+  ): Promise<Response> {
+    let response: [object | BodyInit | null, ResponseInit | undefined];
+    try {
+      const body = await deserialiseRequestBody(bodyClass, ctx.request);
+      const result = await handler(ctx, params, body);
+      response = [result, undefined];
+    } catch (error) {
+      response = buildErrorResponse(ctx, error);
+    }
+    return processResponse(ctx, ...response);
+  };
+}
+
+async function deserialiseRequestBody(
+  target: ClassType | undefined,
+  request: Request,
+): Promise<Record<string, unknown> | undefined> {
+  if (!target) {
+    return;
+  }
+  const body = await request.text();
+  if (!body) {
+    return;
+  }
+  const json = JSON.parse(body);
+  return Object.assign(new target(), json);
 }
 
 // TODO: check if available in std
@@ -66,10 +110,15 @@ export const enum HttpMethod {
   DELETE = "DELETE",
 }
 
+export type ControllerRouteHandler = (
+  ctx: Context,
+  params: Record<string, string | undefined>,
+) => MaybePromise<Response>;
+
 export interface ControllerRoute {
   method: HttpMethod;
   path: `/${string}`;
-  handler: Handler;
+  handler: ControllerRouteHandler;
 }
 
 export function buildRoutePath(

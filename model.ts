@@ -3,6 +3,7 @@
 import * as z from "@x/zod";
 import { ClassType, Fn } from "./utils.ts";
 import {
+  ClassRegistrationType,
   getClassKey,
   maybeGetClassKey,
   registerClass,
@@ -112,12 +113,45 @@ export function ObjectType(): (
     target: Class,
     _context: ClassDecoratorContext<Class>,
   ): void {
-    const key = registerClass(target);
+    const key = registerClass(ClassRegistrationType.ObjectType, target);
     models.set(key, z.object({}));
     // TODO: is there a better way of triggering the field exports?
     new target();
   }
   return objectTypeDecorator;
+}
+
+/**
+ * The input type options
+ */
+export interface InputTypeOptions {
+  /**
+   * The description of the input type
+   *
+   * @example
+   * ```ts
+   * @InputType({ description: "Input" })
+   * class Input {}
+   * ```
+   */
+  description: string;
+}
+
+export function InputType(_options: InputTypeOptions): (
+  target: ClassType,
+  _context: ClassDecoratorContext,
+) => void {
+  function inputTypeDecorator<Class extends ClassType>(
+    target: Class,
+    _context: ClassDecoratorContext<Class>,
+  ): void {
+    const key = registerClass(ClassRegistrationType.InputType, target);
+    // TODO: insert options here
+    models.set(key, z.object({}));
+    // TODO: is there a better way of triggering the field exports?
+    new target();
+  }
+  return inputTypeDecorator;
 }
 
 type MapType<T> = T extends StringConstructor ? string

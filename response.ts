@@ -2,22 +2,8 @@
 import { calculate } from "@std/http/etag";
 import { STATUS_CODE, STATUS_TEXT, StatusCode } from "@std/http/status";
 import { Context } from "./context.ts";
-import { Handler } from "./router.ts";
 
 // TODO: handle doc string
-
-export async function runHandler(
-  ctx: Context,
-  handler: Handler,
-  params: Record<string, string | undefined>,
-): Promise<[object | BodyInit | null, ResponseInit | undefined]> {
-  try {
-    const result = await handler(ctx, params);
-    return [result, undefined];
-  } catch (error) {
-    return buildErrorResponse(ctx, error);
-  }
-}
 
 // TODO: follow RFC https://www.rfc-editor.org/rfc/rfc9457.html
 export interface ErrorResponse {
@@ -32,7 +18,8 @@ export function buildErrorResponse<E extends Error>(
   // TODO: type
   // TODO: instance
   // TODO: work out best way of exposing this
-  const detail = error instanceof Error ? error.message : String(error);
+  const detail = (error instanceof Error ? error.message : undefined) ||
+    String(error);
   // TODO: work out best way of customising this
   const status = getErrorStatusCode(error);
   // TODO: work out best way of customising this
@@ -67,7 +54,7 @@ export async function processResponse(
   if (body instanceof Response) {
     return body;
   }
-  const bodyInit = serialiseBody(ctx, body);
+  const bodyInit = serialiseResponseBody(ctx, body);
   const headers = await createHeaders(ctx, bodyInit, init);
   return new Response(bodyInit, { ...init, headers });
 }
@@ -96,7 +83,7 @@ async function createEtagHeader(
   }
 }
 
-function serialiseBody(
+function serialiseResponseBody(
   _ctx: Context,
   body: object | BodyInit | null | undefined,
 ): BodyInit | null | undefined {

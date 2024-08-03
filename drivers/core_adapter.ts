@@ -5,14 +5,11 @@
 import { assert } from "@std/assert";
 import type { ApplicationListenOptions } from "../application.ts";
 import { Context, type ServerContext } from "../context.ts";
-import {
-  buildErrorResponse,
-  processResponse,
-  runHandler,
-} from "../response.ts";
+import { buildErrorResponse, processResponse } from "../response.ts";
 import type { ControllerRoute } from "../router.ts";
 import type { Driver, Server } from "./driver.ts";
 import { STATUS_CODE, StatusCode } from "jsr:@std/http@^0.224.5/status";
+import { MaybePromise } from "../utils.ts";
 
 export class CoreDriverAdapter implements Driver {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;
@@ -51,10 +48,10 @@ export class CoreDriverAdapter implements Driver {
     }, handler);
   }
 
-  async #handler(
+  #handler(
     request: Request,
     _info: Deno.ServeHandlerInfo,
-  ): Promise<Response> {
+  ): MaybePromise<Response> {
     const ctx = new Context(this.#ctx, request);
     for (const [pathname, methods] of this.#routes) {
       const match = new URLPattern({ pathname }).exec(request.url);
@@ -62,8 +59,7 @@ export class CoreDriverAdapter implements Driver {
         const params = match.pathname.groups;
         const route = methods.get(request.method);
         if (route) {
-          const response = await runHandler(ctx, route.handler, params);
-          return processResponse(ctx, ...response);
+          return route.handler(ctx, params);
         }
         return this.#notFoundResponse(ctx);
       }

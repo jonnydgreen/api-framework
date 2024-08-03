@@ -17,6 +17,7 @@ const registerFnName = "register";
  * @param target - The class to register
  * @returns Registration definition
  */
+// TODO: rename this, it is confusing
 export function getClassRegistration(
   ctx: ServerContext,
   target: ClassType,
@@ -32,7 +33,7 @@ export function getClassRegistration(
   return descriptor.value(ctx);
 }
 
-const classRegistrations = new Map<symbol, ClassType>();
+const classRegistrations = new Map<symbol, ClassRegistration>();
 
 /**
  * Clear class registration. This is predominantly used for testing purposes.
@@ -45,23 +46,47 @@ export function clearRegistration<T>(
   classRegistrations.delete(key);
 }
 
+export const enum ClassRegistrationType {
+  Injectable = "Injectable",
+  ObjectType = "ObjectType",
+  InputType = "InputType",
+}
+
+export interface ClassRegistration {
+  type: ClassRegistrationType;
+  target: ClassType;
+}
+
 /**
  * Get all of the class registrations.
  * @returns - The class registrations as an iterators
  */
-export function getClassRegistrations(): IterableIterator<[symbol, ClassType]> {
-  return classRegistrations.entries();
+export function getClassRegistrations(
+  type?: ClassRegistrationType,
+): [symbol, ClassRegistration][] {
+  if (!type) {
+    return [...classRegistrations.entries()];
+  }
+  return [...classRegistrations.entries()].filter(([, r]) => r.type === type);
 }
 
 const typeKey = Symbol("class.type.key");
 export function registerClass<Class extends ClassType>(
+  type: ClassRegistrationType,
   target: Class,
 ): symbol {
   const key = Symbol(target.name);
   Object.assign(target, { [typeKey]: key });
-  classRegistrations.set(key, target);
+  classRegistrations.set(key, { type, target });
   return key;
 }
+
+export function getRegisteredClass(key: symbol): ClassRegistration {
+  const target = classRegistrations.get(key);
+  assertExists(target, `Class is not registered for key: ${String(key)}`);
+  return target;
+}
+
 export function getClassKey(target: unknown): symbol {
   const key = maybeGetClassKey(target);
   assertExists(
