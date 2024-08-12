@@ -7,6 +7,9 @@ The following secret is required to send code coverage reports to CodeCov:
 
 > **Note: Admins only**
 
-<!-- TODO: get links to docs -->
+Codecov can be setup using this
+[guide](https://docs.codecov.com/docs/quick-start).
 
-Only admins are able to edit this secrets
+Only admins are able to edit the following secrets
+
+- `CODECOV_TOKEN`

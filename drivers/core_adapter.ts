@@ -8,8 +8,8 @@ import { Context, type ServerContext } from "../context.ts";
 import { buildErrorResponse, processResponse } from "../response.ts";
 import type { ControllerRoute } from "../router.ts";
 import type { Driver, Server } from "./driver.ts";
-import { STATUS_CODE, StatusCode } from "jsr:@std/http@^0.224.5/status";
-import { MaybePromise } from "../utils.ts";
+import { STATUS_CODE, type StatusCode } from "jsr:@std/http@^0.224.5/status";
+import type { MaybePromise } from "../utils.ts";
 
 export class CoreDriverAdapter implements Driver {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;

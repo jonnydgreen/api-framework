@@ -6,7 +6,7 @@ import {
   decorate,
   inject,
   injectable,
-  interfaces,
+  type interfaces,
 } from "@npm/inversify";
 import { assertFunction, type ClassType, type Fn } from "./utils.ts";
 import type { ServerContext } from "./context.ts";

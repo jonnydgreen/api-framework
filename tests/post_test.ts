@@ -14,8 +14,8 @@ import {
   Context,
   Controller,
   Field,
-  Injectable,
-  InjectableRegistration,
+  type Injectable,
+  type InjectableRegistration,
   InputType,
   Post,
 } from "../mod.ts";

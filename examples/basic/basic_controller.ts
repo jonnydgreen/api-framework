@@ -2,7 +2,7 @@
 
 import { Controller, Get } from "../../decorators.ts";
 import type { Injectable, InjectableRegistration } from "../../registration.ts";
-import { Message } from "./basic_model.ts";
+import type { Message } from "./basic_model.ts";
 
 @Controller("/messages")
 export class MessageController implements Injectable {

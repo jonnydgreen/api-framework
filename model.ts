@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import * as z from "@x/zod";
-import { ClassType, Fn } from "./utils.ts";
+import type { ClassType, Fn } from "./utils.ts";
 import {
   ClassRegistrationType,
   getClassKey,

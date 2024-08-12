@@ -97,6 +97,7 @@ function checkCodeBlocks(
       content.slice(0, codeBlockMatch.index).split("\n").length;
 
     if (
+      language && codeBlock &&
       ["ts", "js", "typescript", "javascript", ""].includes(
         language.toLocaleLowerCase(),
       )

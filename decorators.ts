@@ -8,8 +8,7 @@ import {
 } from "./registration.ts";
 import { HttpMethod } from "./router.ts";
 import type { ClassType, MaybePromise } from "./utils.ts";
-// TODO: why is the linting not failing here? deno-lint(verbatim-module-syntax)
-import { Context } from "./context.ts";
+import type { Context } from "./context.ts";
 
 export interface ControllerMetadata {
   path: string;

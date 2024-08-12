@@ -9,7 +9,7 @@ import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
 import { ServerContext } from "./context.ts";
 import { buildContainer, registerContainerClassMethods } from "./container.ts";
 import { buildControllerRoutes } from "./router.ts";
-import { assertNever, ClassType } from "./utils.ts";
+import { assertNever, type ClassType } from "./utils.ts";
 
 /**
  * A class which starts the API applications and allows one to register

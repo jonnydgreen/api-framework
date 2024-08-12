@@ -2,9 +2,9 @@
 
 import { assert, assertExists } from "@std/assert";
 import { join } from "@std/path/join";
-import { Container, getContainerClassMethod } from "./container.ts";
+import { type Container, getContainerClassMethod } from "./container.ts";
 import type { Context } from "./context.ts";
-import { controllers, RouteMetadata, routes } from "./decorators.ts";
+import { controllers, type RouteMetadata, routes } from "./decorators.ts";
 import {
   ClassRegistrationType,
   getClassKey,

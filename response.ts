@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-import { calculate } from "@std/http/etag";
-import { STATUS_CODE, STATUS_TEXT, StatusCode } from "@std/http/status";
-import { Context } from "./context.ts";
+import { eTag } from "@std/http/etag";
+import { STATUS_CODE, STATUS_TEXT, type StatusCode } from "@std/http/status";
+import type { Context } from "./context.ts";
 
 // TODO: handle doc string
 
@@ -76,7 +76,7 @@ async function createEtagHeader(
   headers: Headers,
 ): Promise<void> {
   if (typeof bodyInit === "string") {
-    const etag = await calculate(bodyInit);
+    const etag = await eTag(bodyInit);
     if (etag) {
       headers.set("etag", etag);
     }
