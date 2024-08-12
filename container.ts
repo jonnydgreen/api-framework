@@ -7,17 +7,17 @@ import {
   inject,
   injectable,
   type interfaces,
-} from "@npm/inversify";
+} from "inversify";
 import { assertFunction, type ClassType, type Fn } from "./utils.ts";
 import type { ServerContext } from "./context.ts";
 import {
   ClassRegistrationType,
-  getClassKey,
-  getClassRegistration,
   getClassRegistrations,
+  getRegistrationKey,
+  runRegistration,
 } from "./registration.ts";
 
-// TODO: make our own container
+// TODO(jonnydgreen): make our own container
 export type Container = InversifyContainer;
 
 interface IMetadata {
@@ -66,10 +66,10 @@ export async function buildContainer(ctx: ServerContext): Promise<Container> {
     ctx.log.debug(
       `Registering ${key.description} in the container`,
     );
-    const { ctor } = await getClassRegistration(ctx, target);
-    const paramKeys = ctor.map((c, idx) => {
+    const { dependencies } = await runRegistration(ctx, target);
+    const paramKeys = dependencies.map((c, idx) => {
       if (c.class) {
-        return getClassKey(c.class);
+        return getRegistrationKey(c.class);
       }
       throw new ContainerError(
         `Unable to register ${key.description}: unsupported parameter definition at position ${idx}`,
@@ -92,7 +92,7 @@ export function registerContainerClassMethods<T>(
   container: Container,
   target: ClassType<T>,
 ): void {
-  const key = getClassKey(target);
+  const key = getRegistrationKey(target);
   container.get<T>(key);
 }
 
@@ -107,4 +107,4 @@ export function getContainerClassMethod<T>(
   return fn.bind(registeredTarget);
 }
 
-// TODO: move all bits to a class
+// TODO(jonnydgreen): move all bits to a class

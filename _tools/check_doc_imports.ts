@@ -2,10 +2,7 @@
 
 import { blue, red, yellow } from "@std/fmt/colors";
 import { walk } from "@std/fs/walk";
-import ts, {
-  type ImportDeclaration,
-  type StringLiteral,
-} from "@npm/typescript";
+import ts, { type ImportDeclaration, type StringLiteral } from "typescript";
 const {
   createSourceFile,
   ScriptTarget,
@@ -21,11 +18,9 @@ const EXCLUDED_PATHS = [
   "npm",
   "scripts",
   "sandbox",
+  "spikes",
 ];
-const ALLOWED_EXTERNAL_DEPS = [
-  "https://deno.land/x/postgres@v0.17.0/",
-  "npm:@nestjs/common@^10.2.7",
-];
+const ALLOWED_EXTERNAL_DEPS: string[] = [];
 
 const ROOT = new URL("../", import.meta.url);
 const ROOT_LENGTH = ROOT.pathname.slice(0, -1).length;
@@ -55,7 +50,7 @@ function checkImportStatements(
     const { moduleSpecifier } = importDeclaration;
     const importPath = (moduleSpecifier as StringLiteral).text;
     const isRelative = importPath.startsWith(".");
-    // TODO: uncomment when the start path is known
+    // TODO(jonnydgreen): uncomment when the start path is known
     // const isInternal = importPath.startsWith(
     //   "",
     // );

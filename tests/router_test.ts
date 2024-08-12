@@ -14,7 +14,7 @@ Deno.test({
     @Controller("/same-controller")
     class DuplicateSameController implements Injectable {
       public register(): InjectableRegistration {
-        return { ctor: [] };
+        return { dependencies: [] };
       }
 
       @Get({ path: "/duplicate" })
@@ -42,7 +42,7 @@ Deno.test({
     @Controller("/different-controller")
     class DuplicateDifferentController1 implements Injectable {
       public register(): InjectableRegistration {
-        return { ctor: [] };
+        return { dependencies: [] };
       }
 
       @Get({ path: "/duplicate" })
@@ -53,7 +53,7 @@ Deno.test({
     @Controller("/different-controller")
     class DuplicateDifferentController2 implements Injectable {
       public register(): InjectableRegistration {
-        return { ctor: [] };
+        return { dependencies: [] };
       }
 
       @Get({ path: "/duplicate" })

@@ -137,7 +137,7 @@ export class Controller {
     };
   }
 
-  // TODO: Implement Union type
+  // TODO(jonnydgreen): Implement Union type
   // @Post({ outputType: Union(Hello, String) })
   // public getHelloUnion(): Hello | string {
   //   return {

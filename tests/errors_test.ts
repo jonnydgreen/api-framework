@@ -87,7 +87,7 @@ Deno.test({
   },
 });
 
-// TODO: should this be a method not supported error instead?
+// TODO(jonnydgreen): should this be a method not supported error instead?
 Deno.test({
   name:
     "buildErrorResponse() returns an RFC-9457 compliant Not Found error when a route method is not registered for a registered path",
@@ -115,7 +115,7 @@ Deno.test({
 @Controller("/")
 class MessageController implements Injectable {
   public register(): InjectableRegistration {
-    return { ctor: [] };
+    return { dependencies: [] };
   }
 
   @Get({ path: "/error" })

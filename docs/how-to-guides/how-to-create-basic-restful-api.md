@@ -1,7 +1,7 @@
 # How-To create a basic RESTful API
 
-<!-- TODO: add links for concepts -->
-<!-- TODO: add relevant concepts for each stage to find out more -->
+<!-- TODO(jonnydgreen): add links for concepts -->
+<!-- TODO(jonnydgreen): add relevant concepts for each stage to find out more -->
 
 ## Concepts
 
@@ -64,7 +64,7 @@ Finally, spin up your application as follows:
 deno run --allow-net app.ts
 ```
 
-<!-- TODO: link -->
+<!-- TODO(jonnydgreen): link -->
 
 And separately, call it with a client of your choice. Here, we can cURL:
 

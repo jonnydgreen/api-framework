@@ -3,9 +3,9 @@ import { eTag } from "@std/http/etag";
 import { STATUS_CODE, STATUS_TEXT, type StatusCode } from "@std/http/status";
 import type { Context } from "./context.ts";
 
-// TODO: handle doc string
+// TODO(jonnydgreen): handle doc string
 
-// TODO: follow RFC https://www.rfc-editor.org/rfc/rfc9457.html
+// TODO(jonnydgreen): follow RFC https://www.rfc-editor.org/rfc/rfc9457.html
 export interface ErrorResponse {
   status: StatusCode;
   title: string;
@@ -15,17 +15,17 @@ export function buildErrorResponse<E extends Error>(
   ctx: Context,
   error: unknown,
 ): [ErrorResponse, ResponseInit | undefined] {
-  // TODO: type
-  // TODO: instance
-  // TODO: work out best way of exposing this
+  // TODO(jonnydgreen): type
+  // TODO(jonnydgreen): instance
+  // TODO(jonnydgreen): work out best way of exposing this
   const detail = (error instanceof Error ? error.message : undefined) ||
     String(error);
-  // TODO: work out best way of customising this
+  // TODO(jonnydgreen): work out best way of customising this
   const status = getErrorStatusCode(error);
-  // TODO: work out best way of customising this
+  // TODO(jonnydgreen): work out best way of customising this
   const title = STATUS_TEXT[status];
   const body: ErrorResponse = { status, title, detail };
-  // TODO: JSON logs
+  // TODO(jonnydgreen): JSON logs
   ctx.log.error(`Error running handler: ${detail}`);
   return [body, {
     headers: { "content-type": "application/problem+json" },
@@ -91,7 +91,7 @@ function serialiseResponseBody(
   if (typeof body === "string") {
     bodyInit = body;
   } else if (typeof body === "object") {
-    // TODO: handle content types here
+    // TODO(jonnydgreen): handle content types here
     bodyInit = JSON.stringify(body);
   }
   return bodyInit;

@@ -2,7 +2,7 @@
 import { assert } from "@std/assert";
 import {
   ClassRegistrationType,
-  getClassKey,
+  getRegistrationKey,
   type Injectable,
   registerClass,
 } from "./registration.ts";
@@ -22,7 +22,10 @@ export function Controller(path: `/${string}`) {
     target: ClassType<Injectable>,
     _context: ClassDecoratorContext,
   ): void {
-    const key = registerClass(ClassRegistrationType.Injectable, target);
+    const key = registerClass({
+      type: ClassRegistrationType.Injectable,
+      target,
+    });
     controllers.set(key, { path });
   }
   return controllerDecorator;
@@ -36,7 +39,7 @@ export function Service(): (
     target: ClassType<Injectable>,
     _context: ClassDecoratorContext,
   ): void {
-    registerClass(ClassRegistrationType.Injectable, target);
+    registerClass({ type: ClassRegistrationType.Injectable, target });
   }
   return serviceDecorator;
 }
@@ -64,7 +67,7 @@ export function Get<R>(options: GetOptions<R>) {
       const thisArg = this as ClassType;
       const className = thisArg.constructor.name;
       const methodSlug = `${className}.${String(methodName)}`;
-      const classKey = getClassKey(thisArg.constructor);
+      const classKey = getRegistrationKey(thisArg.constructor);
       assert(
         !context.private,
         `'Get' cannot decorate private property: ${methodSlug}`,
@@ -90,18 +93,26 @@ export interface PostOptions<
   response?: ResponseType;
 }
 
-// TODO: docs with examples
+type PostDecoratorTarget<
+  RequestBody,
+  ResponseType,
+> = (
+  ctx: Context,
+  params: unknown,
+  body: RequestBody,
+) => MaybePromise<ResponseType>;
+
+type PostMethodDecorator<RequestBody, ResponseType> = (
+  target: PostDecoratorTarget<RequestBody, ResponseType>,
+  context: ClassMethodDecoratorContext,
+) => void;
+
+// TODO(jonnydgreen): examples
 export function Post<RequestBody, ResponseType>(
   options: PostOptions<ClassType<RequestBody>, ResponseType>,
-) {
-  return function post<
-    T extends (
-      ctx: Context,
-      params: unknown,
-      body: RequestBody,
-    ) => MaybePromise<ResponseType>,
-  >(
-    _target: T,
+): PostMethodDecorator<RequestBody, ResponseType> {
+  return function post(
+    _target: PostDecoratorTarget<RequestBody, ResponseType>,
     context: ClassMethodDecoratorContext,
   ): void {
     const methodName = context.name;
@@ -110,14 +121,14 @@ export function Post<RequestBody, ResponseType>(
       const thisArg = this as ClassType;
       const className = thisArg.constructor.name;
       const methodSlug = `${className}.${String(methodName)}`;
-      const classKey = getClassKey(thisArg.constructor);
+      const classKey = getRegistrationKey(thisArg.constructor);
       assert(
         !context.private,
         `'Post' cannot decorate private property: ${methodSlug}`,
       );
       let body: symbol | undefined = undefined;
       if (options.body) {
-        body = getClassKey(options.body);
+        body = getRegistrationKey(options.body);
       }
       if (!routes.has(key)) {
         routes.set(key, {

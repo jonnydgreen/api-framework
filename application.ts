@@ -1,8 +1,8 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-// TODO: doc-strings with full examples
+// TODO(jonnydgreen): doc-strings with full examples
 
-// TODO: define ourselves
+// TODO(jonnydgreen): define ourselves
 import type { LevelName, Logger } from "@std/log";
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
 import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
@@ -99,7 +99,7 @@ export class Application {
 }
 
 /**
- * The Application Options
+ * The Application Options for {@linkcode Application}
  */
 export interface ApplicationOptions {
   driver?: DriverStrategy | Driver;
@@ -107,7 +107,7 @@ export interface ApplicationOptions {
 }
 
 /**
- * The Application Listen Options.
+ * The Application Listen Options for {@linkcode Application.listen}
  */
 export interface ApplicationListenOptions {
   /**
@@ -142,7 +142,7 @@ export type ApplicationVersion = `v${number}${
   | `alpha${number}`}`;
 
 /**
- * The application version options when registering a version.
+ * The application version options when registering a version using {@linkcode Application.registerVersion}
  */
 export interface ApplicationVersionOptions {
   /**

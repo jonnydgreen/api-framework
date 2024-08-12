@@ -7,10 +7,10 @@ import type { Message } from "./basic_model.ts";
 @Controller("/messages")
 export class MessageController implements Injectable {
   register(): InjectableRegistration {
-    return { ctor: [] };
+    return { dependencies: [] };
   }
 
-  // TODO: uncomment
+  // TODO(jonnydgreen): uncomment
   // @Get({ responseType: List(Message) })
   @Get({ path: "/" })
   public getMessages(): Message[] {

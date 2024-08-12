@@ -26,7 +26,7 @@ Based on the above it is recommend to use our own DI container solution.
 
 Why use dependency injection?
 
-<!-- TODO: links and verify that this isn't nonsense.  -->
+<!-- TODO(jonnydgreen): links and verify that this isn't nonsense.  -->
 
 When developing services, it is good practice to use
 [SOLID principles](https://en.wikipedia.org/wiki/SOLID) for the software

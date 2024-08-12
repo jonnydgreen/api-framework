@@ -2,8 +2,14 @@
 
 import { ConsoleHandler, type LevelName, Logger } from "@std/log";
 
-// TODO: doc string
+// TODO(jonnydgreen): example
 
+/**
+ * Create an logger for the defined log level.
+ *
+ * @param levelName The log level that the logger instance will run as.
+ * @returns a Logger instance.
+ */
 export function createLogger(levelName: LevelName = "DEBUG"): Logger {
   return new Logger("api-framework", levelName, {
     handlers: [new ConsoleHandler(levelName)],

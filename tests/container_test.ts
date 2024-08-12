@@ -53,7 +53,7 @@ Deno.test({
       public register(): MaybePromise<InjectableRegistration> {
         return {
           // deno-lint-ignore no-explicit-any
-          ctor: [{ unsupported: "blah" } as any],
+          dependencies: [{ unsupported: "blah" } as any],
         };
       }
     }
@@ -77,7 +77,7 @@ class MessageController implements Injectable {
   }
 
   public register(): InjectableRegistration {
-    return { ctor: [{ class: MessageService }] };
+    return { dependencies: [{ class: MessageService }] };
   }
 
   @Get({ path: "/" })
@@ -95,7 +95,7 @@ class MessageService implements Injectable {
   }
 
   public register(): InjectableRegistration {
-    return { ctor: [{ class: MessageRepository }] };
+    return { dependencies: [{ class: MessageRepository }] };
   }
 
   public getMessages(): Message[] {
@@ -115,7 +115,7 @@ interface Message {
 @Service()
 class MessageRepository implements Injectable, MessageRepositoryContract {
   public register(): InjectableRegistration {
-    return { ctor: [] };
+    return { dependencies: [] };
   }
 
   public getMessages(): Message[] {

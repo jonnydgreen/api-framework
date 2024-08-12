@@ -1,16 +1,16 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import * as z from "@x/zod";
+import * as z from "zod";
 import type { ClassType, Fn } from "./utils.ts";
 import {
   ClassRegistrationType,
-  getClassKey,
-  maybeGetClassKey,
+  getRegistrationKey,
+  maybeGetRegistrationKey,
   registerClass,
 } from "./registration.ts";
 import { assertExists } from "@std/assert";
 
-// TODO: doc string
+// TODO(jonnydgreen): doc string
 
 export type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
 const models = new Map<symbol, ValidationMetadata>();
@@ -37,7 +37,7 @@ export function Field<
       );
 
       // Handle custom types
-      const fieldTypeKey = maybeGetClassKey(options.type);
+      const fieldTypeKey = maybeGetRegistrationKey(options.type);
       if (fieldTypeKey) {
         const customValidation = models.get(fieldTypeKey);
         assertExists(
@@ -91,7 +91,7 @@ export interface TypeInfo<Type extends z.ZodRawShape> {
 export function getTypeInfo<Class extends ClassType>(
   target: Class | Fn,
 ): TypeInfo<InstanceType<Class>> {
-  const key = getClassKey(target);
+  const key = getRegistrationKey(target);
   const schema = models.get(key);
   assertExists(
     schema,
@@ -113,9 +113,12 @@ export function ObjectType(): (
     target: Class,
     _context: ClassDecoratorContext<Class>,
   ): void {
-    const key = registerClass(ClassRegistrationType.ObjectType, target);
+    const key = registerClass({
+      type: ClassRegistrationType.ObjectType,
+      target,
+    });
     models.set(key, z.object({}));
-    // TODO: is there a better way of triggering the field exports?
+    // TODO(jonnydgreen): is there a better way of triggering the field exports?
     new target();
   }
   return objectTypeDecorator;
@@ -145,10 +148,13 @@ export function InputType(_options: InputTypeOptions): (
     target: Class,
     _context: ClassDecoratorContext<Class>,
   ): void {
-    const key = registerClass(ClassRegistrationType.InputType, target);
-    // TODO: insert options here
+    const key = registerClass({
+      type: ClassRegistrationType.InputType,
+      target,
+    });
+    // TODO(jonnydgreen): insert options here
     models.set(key, z.object({}));
-    // TODO: is there a better way of triggering the field exports?
+    // TODO(jonnydgreen): is there a better way of triggering the field exports?
     new target();
   }
   return inputTypeDecorator;

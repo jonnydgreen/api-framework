@@ -75,7 +75,7 @@ class MessageInput {
 @Controller("/messages")
 class MessageController implements Injectable {
   public register(): InjectableRegistration {
-    return { ctor: [] };
+    return { dependencies: [] };
   }
 
   @Post({ path: "/" })

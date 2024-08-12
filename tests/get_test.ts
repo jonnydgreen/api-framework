@@ -39,7 +39,7 @@ Deno.test({
 @Controller("/messages")
 class MessageController implements Injectable {
   public register(): InjectableRegistration {
-    return { ctor: [] };
+    return { dependencies: [] };
   }
 
   @Get({ path: "/" })

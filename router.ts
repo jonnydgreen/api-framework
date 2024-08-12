@@ -7,13 +7,13 @@ import type { Context } from "./context.ts";
 import { controllers, type RouteMetadata, routes } from "./decorators.ts";
 import {
   ClassRegistrationType,
-  getClassKey,
-  getRegisteredClass,
+  getClassRegistrationByKey,
+  getRegistrationKey,
 } from "./registration.ts";
 import { buildErrorResponse, processResponse } from "./response.ts";
 import type { ClassType, MaybePromise } from "./utils.ts";
 
-// TODO: doc-strings with full examples
+// TODO(jonnydgreen): doc-strings with full examples
 
 export type Handler = (
   ctx: Context,
@@ -27,7 +27,7 @@ export function buildControllerRoutes(
   controller: ClassType,
 ): ControllerRoute[] {
   const controllerRoutes: ControllerRoute[] = [];
-  const controllerKey = getClassKey(controller);
+  const controllerKey = getRegistrationKey(controller);
   const filteredRoutes = [...routes.values()].filter((route) =>
     route.controller === controllerKey
   );
@@ -59,7 +59,7 @@ function buildHandler(
 ): ControllerRouteHandler {
   let bodyClass: ClassType | undefined = undefined;
   if (route.body) {
-    const registeredClass = getRegisteredClass(route.body);
+    const registeredClass = getClassRegistrationByKey(route.body);
     assert(
       registeredClass.type === ClassRegistrationType.InputType,
       `Registered class for key ${
@@ -100,7 +100,7 @@ async function deserialiseRequestBody(
   return Object.assign(new target(), json);
 }
 
-// TODO: check if available in std
+// TODO(jonnydgreen): check if available in std
 export const enum HttpMethod {
   GET = "GET",
   POST = "POST",
