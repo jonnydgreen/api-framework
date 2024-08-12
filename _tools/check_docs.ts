@@ -1,3 +1,4 @@
+// Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 /**
  * This script checks that all public symbols documentation aligns with the
  * {@link ./CONTRIBUTING.md#documentation | documentation guidelines}.

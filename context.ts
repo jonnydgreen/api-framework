@@ -1,7 +1,6 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import type { LevelName, Logger } from "@std/log";
-import { createLogger } from "./logger.ts";
+import { createLogger, type LevelName, type Logger } from "./logger.ts";
 
 /**
  * The server context. This is created for the {@linkcode Application} instance

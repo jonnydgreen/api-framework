@@ -85,11 +85,11 @@ export class CoreDriverAdapter implements Driver {
 }
 
 export class HttpError extends Error {
-  override readonly name = "NotFoundError";
-  readonly statusCode: StatusCode = STATUS_CODE.InternalServerError;
+  public override readonly name = "NotFoundError";
+  public readonly statusCode: StatusCode = STATUS_CODE.InternalServerError;
 }
 
 export class NotFoundError extends HttpError {
-  override readonly name = "NotFoundError";
-  override readonly statusCode: StatusCode = STATUS_CODE.NotFound;
+  public override readonly name = "NotFoundError";
+  public override readonly statusCode: StatusCode = STATUS_CODE.NotFound;
 }

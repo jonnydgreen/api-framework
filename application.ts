@@ -2,27 +2,25 @@
 
 // TODO(jonnydgreen): doc-strings with full examples
 
-// TODO(jonnydgreen): define ourselves
-import type { LevelName, Logger } from "@std/log";
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
 import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
 import { ServerContext } from "./context.ts";
 import { buildContainer, registerContainerClassMethods } from "./container.ts";
 import { buildControllerRoutes } from "./router.ts";
 import { assertNever, type ClassType } from "./utils.ts";
+import type { LevelName, Logger } from "./logger.ts";
 
 /**
  * A class which starts the API applications and allows one to register
  * routes and capabilities to process inbound requests against.
  */
 export class Application {
-  readonly options: Readonly<ApplicationOptions>;
-  readonly #driver: Readonly<Driver>;
-  readonly #versions = new Map<string, ApplicationVersionOptions>();
-
+  public readonly options: Readonly<ApplicationOptions>;
+  public readonly log: Readonly<Logger>;
   public readonly ctx: Readonly<ServerContext>;
 
-  public readonly log: Readonly<Logger>;
+  readonly #driver: Readonly<Driver>;
+  readonly #versions = new Map<string, ApplicationVersionOptions>();
 
   constructor(options?: ApplicationOptions) {
     // Driver

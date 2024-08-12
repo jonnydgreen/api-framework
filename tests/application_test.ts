@@ -9,7 +9,6 @@ import {
   assertThrows,
 } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
-import { Logger } from "@std/log";
 import { Application } from "../application.ts";
 import type { Injectable, InjectableRegistration } from "../registration.ts";
 import { ServerContext } from "../context.ts";
@@ -19,6 +18,7 @@ import { buildServerOrigin, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
 import { DriverStrategy, type Server } from "../drivers/driver.ts";
 import { CoreDriverAdapter } from "../drivers/core_adapter.ts";
+import { Logger } from "../logger.ts";
 
 Deno.test({
   name: "Application() supports default settings",

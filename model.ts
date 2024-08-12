@@ -10,17 +10,27 @@ import {
 } from "./registration.ts";
 import { assertExists } from "@std/assert";
 
-// TODO(jonnydgreen): doc string
+export type { ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 
-export type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
 const models = new Map<symbol, ValidationMetadata>();
 
+type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
+
+/**
+ * The input type class method decorator that registers a field for a type.
+ *
+ * @param options The field type options
+ */
 export function Field<
   Constructor extends ClassType,
   Type extends MapType<Constructor>,
 >(
   options: FieldOptions<Constructor>,
-) {
+): <Class>(
+  this: unknown,
+  _target: Class,
+  context: ClassFieldDecoratorContext<Class, Type>,
+) => (this: Class, value: Type) => Type {
   function fieldDecorator<Class>(
     this: unknown,
     _target: Class,
@@ -84,10 +94,28 @@ export function Field<
   return fieldDecorator;
 }
 
-export interface TypeInfo<Type extends z.ZodRawShape> {
-  key: symbol;
-  schema: z.ZodObject<Type, "strip", z.ZodTypeAny, Type, Type>;
+/**
+ * The field options for {@linkcode Field}.
+ */
+export interface FieldOptions<Type> {
+  /**
+   * The description of the field type.
+   */
+  description: string;
+  /**
+   * The type of the field type.
+   */
+  type: Type;
 }
+
+/**
+ * Get the type information for a registered model.
+ *
+ * If no schema is defined for the model, then an error will be thrown.
+ *
+ * @param target The target model to get the type information from.
+ * @returns The type information
+ */
 export function getTypeInfo<Class extends ClassType>(
   target: Class | Fn,
 ): TypeInfo<InstanceType<Class>> {
@@ -100,12 +128,37 @@ export function getTypeInfo<Class extends ClassType>(
   return { key, schema: schema as TypeInfo<InstanceType<Class>>["schema"] };
 }
 
-export interface FieldOptions<Type> {
-  description: string;
-  type: Type;
+/**
+ * The type info schema used in {@linkcode TypeInfo}.
+ */
+export type TypeInfoSchema<Type extends z.ZodRawShape> = z.ZodObject<
+  Type,
+  "strip",
+  z.ZodTypeAny,
+  Type,
+  Type
+>;
+
+/**
+ * The type information returned by {@linkcode getTypeInfo}.
+ */
+export interface TypeInfo<Type extends z.ZodRawShape> {
+  /**
+   * The registration key of the type information.
+   */
+  key: symbol;
+  /**
+   * The schema of the of the type information.
+   */
+  schema: TypeInfoSchema<Type>;
 }
 
-export function ObjectType(): (
+/**
+ * The object type class decorator that registers a class as an object type.
+ *
+ * @param _options The object type options
+ */
+export function ObjectType(_options: ObjectTypeOptions): (
   target: ClassType,
   _context: ClassDecoratorContext,
 ) => void {
@@ -125,21 +178,26 @@ export function ObjectType(): (
 }
 
 /**
- * The input type options
+ * The object type options for {@linkcode ObjectType}.
  */
-export interface InputTypeOptions {
+export interface ObjectTypeOptions {
   /**
-   * The description of the input type
+   * The description of the object type.
    *
    * @example
    * ```ts
-   * @InputType({ description: "Input" })
-   * class Input {}
+   * \@ObjectType({ description: "Object" })
+   * class Object {}
    * ```
    */
   description: string;
 }
 
+/**
+ * The input type class decorator that registers a class as an input type.
+ *
+ * @param _options The input type options
+ */
 export function InputType(_options: InputTypeOptions): (
   target: ClassType,
   _context: ClassDecoratorContext,
@@ -160,7 +218,27 @@ export function InputType(_options: InputTypeOptions): (
   return inputTypeDecorator;
 }
 
-type MapType<T> = T extends StringConstructor ? string
+/**
+ * The input type options for {@linkcode InputType}.
+ */
+export interface InputTypeOptions {
+  /**
+   * The description of the input type.
+   *
+   * @example
+   * ```ts
+   * \@InputType({ description: "Input" })
+   * class Input {}
+   * ```
+   */
+  description: string;
+}
+
+/**
+ * A type mapper that is used to convert types defined in decorators to those
+ * defined on the decorated definitions.
+ */
+export type MapType<T> = T extends StringConstructor ? string
   : T extends NumberConstructor ? number
   : T extends BooleanConstructor ? boolean
   : T extends undefined ? undefined

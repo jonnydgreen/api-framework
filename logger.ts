@@ -4,6 +4,9 @@ import { ConsoleHandler, type LevelName, Logger } from "@std/log";
 
 // TODO(jonnydgreen): example
 
+// TODO(jonnydgreen): define ourselves
+export { type LevelName, Logger } from "@std/log";
+
 /**
  * Create an logger for the defined log level.
  *

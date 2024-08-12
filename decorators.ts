@@ -17,7 +17,7 @@ export interface ControllerMetadata {
 export const controllers = new Map<symbol, ControllerMetadata>();
 export const routes = new Map<symbol, RouteMetadata>();
 
-export function Controller(path: `/${string}`) {
+export function Controller(path: `/${string}`): InjectableDecorator {
   function controllerDecorator(
     target: ClassType<Injectable>,
     _context: ClassDecoratorContext,
@@ -31,10 +31,7 @@ export function Controller(path: `/${string}`) {
   return controllerDecorator;
 }
 
-export function Service(): (
-  target: ClassType<Injectable>,
-  _context: ClassDecoratorContext,
-) => void {
+export function Service(): InjectableDecorator {
   function serviceDecorator(
     target: ClassType<Injectable>,
     _context: ClassDecoratorContext,
@@ -43,6 +40,11 @@ export function Service(): (
   }
   return serviceDecorator;
 }
+
+export type InjectableDecorator = (
+  target: ClassType<Injectable>,
+  _context: ClassDecoratorContext,
+) => void;
 
 export interface GetOptions<R> {
   path: `/${string}`;
@@ -56,9 +58,23 @@ export interface RouteMetadata {
   body?: symbol;
 }
 
-export function Get<R>(options: GetOptions<R>) {
-  return function get<T extends (...args: unknown[]) => MaybePromise<R>>(
-    _target: T,
+export type GetDecoratorTarget<
+  ResponseType,
+> = (
+  ctx: Context,
+  params: unknown,
+) => MaybePromise<ResponseType>;
+
+export type GetMethodDecorator<ResponseType> = (
+  target: GetDecoratorTarget<ResponseType>,
+  context: ClassMethodDecoratorContext,
+) => void;
+
+export function Get<ResponseType>(
+  options: GetOptions<ResponseType>,
+): GetMethodDecorator<ResponseType> {
+  return function get(
+    _target: GetDecoratorTarget<ResponseType>,
     context: ClassMethodDecoratorContext,
   ): void {
     const methodName = context.name;
@@ -93,7 +109,7 @@ export interface PostOptions<
   response?: ResponseType;
 }
 
-type PostDecoratorTarget<
+export type PostDecoratorTarget<
   RequestBody,
   ResponseType,
 > = (
@@ -102,7 +118,7 @@ type PostDecoratorTarget<
   body: RequestBody,
 ) => MaybePromise<ResponseType>;
 
-type PostMethodDecorator<RequestBody, ResponseType> = (
+export type PostMethodDecorator<RequestBody, ResponseType> = (
   target: PostDecoratorTarget<RequestBody, ResponseType>,
   context: ClassMethodDecoratorContext,
 ) => void;
