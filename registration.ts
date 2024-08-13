@@ -3,8 +3,6 @@ import { assertExists } from "@std/assert";
 import type { ServerContext } from "./context.ts";
 import { assertFunction, type ClassType, type MaybePromise } from "./utils.ts";
 
-// TODO(jonnydgreen): doc strings with example usages
-
 const registerFnName = "register";
 
 // TODO(jonnydgreen): rename this, it is confusing

@@ -146,6 +146,17 @@ export function setupContainerClass<T>(
  * @param methodName The method name of the instantiated class.
  * @typeParam T The class type of the container class method.
  * @returns The instantiated class method.
+ *
+ * @example Usage
+ * ```ts no-eval
+ * import { ServerContext, getContainerClassMethod, buildContainer } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const ctx = new ServerContext("INFO");
+ * const container = await buildContainer(ctx);
+ * const method = getContainerClassMethod(container, Symbol("target"), "methodName");
+ * assert(typeof method === "function");
+ * ```
  */
 export function getContainerClassMethod<T>(
   container: Container,

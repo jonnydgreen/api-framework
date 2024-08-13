@@ -3,8 +3,6 @@ import { eTag } from "@std/http/etag";
 import { STATUS_CODE, STATUS_TEXT, type StatusCode } from "@std/http/status";
 import type { Context } from "./context.ts";
 
-// TODO(jonnydgreen): handle doc string
-
 // TODO(jonnydgreen): follow RFC https://www.rfc-editor.org/rfc/rfc9457.html
 export interface ErrorResponse {
   status: StatusCode;

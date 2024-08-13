@@ -204,7 +204,6 @@ export type GetMethodDecorator<ResponseType> = (
   context: ClassMethodDecoratorContext,
 ) => void;
 
-// TODO(jonnydgreen): examples
 /**
  * Register a POST route with the provided options for the class method.
  *

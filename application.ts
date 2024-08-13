@@ -1,7 +1,5 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-// TODO(jonnydgreen): doc-strings with full examples
-
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
 import { type Driver, DriverStrategy } from "./drivers/driver.ts";
 import { ServerContext } from "./context.ts";

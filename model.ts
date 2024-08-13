@@ -224,6 +224,13 @@ export function InputType(_options: InputTypeOptions): (
 export interface InputTypeOptions {
   /**
    * The description of the input type.
+   *
+   * @example
+   * ```ts
+   * import { InputType } from "@eyrie/app"
+   * @InputType({ description: "Input" })
+   * class Input {}
+   * ```
    */
   description: string;
 }

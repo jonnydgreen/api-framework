@@ -2,8 +2,6 @@
 
 import { ConsoleHandler, type LevelName, Logger } from "@std/log";
 
-// TODO(jonnydgreen): example
-
 // TODO(jonnydgreen): define ourselves
 export { type LevelName, Logger } from "@std/log";
 
@@ -12,8 +10,20 @@ export { type LevelName, Logger } from "@std/log";
  *
  * @param levelName The log level that the logger instance will run as.
  * @returns a Logger instance.
+ *
+ * @example Usage
+ * ```ts
+ * import { createLogger } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const defaultLogger = createLogger();
+ * assert(defaultLogger);
+ *
+ * const debugLogger = createLogger('DEBUG');
+ * assert(debugLogger);
+ * ```
  */
-export function createLogger(levelName: LevelName = "DEBUG"): Logger {
+export function createLogger(levelName: LevelName = "INFO"): Logger {
   return new Logger("api-framework", levelName, {
     handlers: [new ConsoleHandler(levelName)],
   });

@@ -8,6 +8,29 @@ import { assert, AssertionError } from "@std/assert";
  * @param _input The input (that should never be passed)
  * @param message A custom message to use when an input is passed
  * @returns Nothing
+ *
+ * @example Usage
+ * ```ts no-eval no-assert
+ * import { assertNever } from "@eyrie/app"
+ *
+ * enum Hello {
+ *   Hi,
+ *   Ahoy,
+ * }
+ *
+ * const input = Hello.Hi as Hello;
+ * switch (input) {
+ *   case Hello.Hi: {
+ *     break;
+ *   }
+ *   case Hello.Ahoy: {
+ *     break;
+ *   }
+ *   default: {
+ *     assertNever(input, "Should never reach here"); // Errors at compile time
+ *   }
+ * }
+ * ```
  */
 export function assertNever(
   _input: never,
@@ -20,6 +43,15 @@ export function assertNever(
  * Asserts that an input is a function
  * @param input The input to check
  * @param message A custom message to use when the input is not a function
+ *
+ * @example Usage
+ * ```ts no-eval no-assert
+ * import { assertFunction } from "@eyrie/app"
+ *
+ * assertFunction(function hello(): void {}) // Ok
+ * assertFunction("string") // Throws an error with default message
+ * assertFunction("string", "Custom message") // Throws an error with custom message: "Custom message"
+ * ```
  */
 export function assertFunction(
   input: unknown,

@@ -17,8 +17,6 @@ import {
 import { buildErrorResponse, processResponse } from "./response.ts";
 import type { ClassType, MaybePromise } from "./utils.ts";
 
-// TODO(jonnydgreen): examples
-
 /**
  * Build the controller routes for a specified version.
  *
@@ -32,6 +30,19 @@ import type { ClassType, MaybePromise } from "./utils.ts";
  * @param version The version to register the controller for.
  * @param controller The controller to register routes for
  * @returns All the registered controller routes.
+ *
+ * @example Usage
+ * ```ts no-eval
+ * import { ServerContext, buildControllerRoutes, buildContainer } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const ctx = new ServerContext("INFO");
+ * const container = await buildContainer(ctx);
+ * class MessageController {}
+ *
+ * const routes = buildControllerRoutes(container, "v1", MessageController);
+ * assert(routes.length);
+ * ```
  */
 export function buildControllerRoutes(
   container: Container,

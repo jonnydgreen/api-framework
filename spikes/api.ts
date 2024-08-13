@@ -137,14 +137,13 @@ export class Controller {
     };
   }
 
-  // TODO(jonnydgreen): Implement Union type
-  // @Post({ outputType: Union(Hello, String) })
-  // public getHelloUnion(): Hello | string {
-  //   return {
-  //     name: "name",
-  //     address: "address",
-  //   };
-  // }
+  @Post({ outputType: Union(Hello, String) })
+  public getHelloUnion(): Hello | string {
+    return {
+      name: "name",
+      address: "address",
+    };
+  }
 }
 
 const c = new Controller();
