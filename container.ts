@@ -126,6 +126,7 @@ export class ContainerError extends Error {
  * Setup the container class by instantiating it.
  * @param container The container containing the class to instantiate
  * @param target The class to instantiate. This must be registered within the system.
+ * @typeParam T The class type of the container class to setup.
  */
 export function setupContainerClass<T>(
   container: Container,
@@ -143,6 +144,7 @@ export function setupContainerClass<T>(
  * @param container The container to fetch the class method from.
  * @param targetKey The key of the instantiated class in the container.
  * @param methodName The method name of the instantiated class.
+ * @typeParam T The class type of the container class method.
  * @returns The instantiated class method.
  */
 export function getContainerClassMethod<T>(

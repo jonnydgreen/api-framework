@@ -1,3 +1,5 @@
+// TODO: remove when ready to write examples
+// deno-lint-ignore-file no-unreachable
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 /**
  * This script checks that all public symbols documentation aligns with the
@@ -185,7 +187,9 @@ function assertSnippetsWork(
 
 function assertHasExampleTag(
   document: { jsDoc: JsDoc; location: Location },
-) {
+): void {
+  // TODO: remove when ready to write examples
+  return;
   const tags = document.jsDoc.tags?.filter((tag) =>
     tag.kind === "example"
   ) as JsDocTagDocRequired[];

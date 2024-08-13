@@ -3,20 +3,22 @@
 import { createLogger, type LevelName, type Logger } from "./logger.ts";
 
 /**
- * The server context. This is created for the {@linkcode Application} instance
+ * The server context. This is created for the Application instance
  * and contains crucial application-specific information and functionality
- * to be used throughout the lifetime of the {@linkcode Application}.
+ * to be used throughout the lifetime of the Application.
  */
 export class ServerContext {
   /**
-   * A logger instance scoped to the {@linkcode Application}
+   * A logger instance scoped to the Application
    */
-  public readonly log: Readonly<Logger>;
+  readonly log: Readonly<Logger>;
 
   /**
-   * The server context. This is created for the {@linkcode Application} instance
+   * The server context. This is created for the Application instance
    * and contains crucial application-specific information and functionality
-   * to be used throughout the lifetime of the {@linkcode Application}.
+   * to be used throughout the lifetime of the Application.
+   *
+   * @param levelName The log level of the {@linkcode Logger} for the {@linkcode ServerContext}.
    */
   constructor(levelName: LevelName) {
     this.log = createLogger(levelName);
@@ -32,17 +34,20 @@ export class Context {
   /**
    * A logger instance scoped to the {@linkcode Request}.
    */
-  public readonly log: Readonly<Logger>;
+  readonly log: Readonly<Logger>;
 
   /**
    * The incoming request instance.
    */
-  public readonly request: Readonly<Request>;
+  readonly request: Readonly<Request>;
 
   /**
    * The request context. This is created for every incoming {@linkcode Request}
    * and contains crucial request-specific information and functionality
    * to be used by the handler of the request.
+   *
+   * @param ctx The {@linkcode ServerContext} that is scoped to the Application.
+   * @param request The incoming {@linkcode Request} that is scoped to the {@linkcode Context}.
    */
   constructor(
     ctx: ServerContext,

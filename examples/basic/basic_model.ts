@@ -2,7 +2,7 @@
 
 import { Field, ObjectType } from "../../model.ts";
 
-@ObjectType()
+@ObjectType({ description: "The Message." })
 export class Message {
   @Field({ description: "The ID of the Message.", type: String })
   id!: string;

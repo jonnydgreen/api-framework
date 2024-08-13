@@ -39,6 +39,7 @@ const classRegistrations = new Map<symbol, ClassRegistration>();
 /**
  * Clear class registration. This is predominantly used for testing purposes.
  * @param target The class to clear
+ * @typeParam T The type of the Class.
  */
 export function clearRegistration<T>(
   target: ClassType<T>,
@@ -101,7 +102,7 @@ const typeKey = Symbol("class.type.key");
  *
  * @param type The type of registration. This allows one to use a class for specific purposes.
  * @param target The target to register.
- * @returns
+ * @returns The symbol used to register the class
  */
 export function registerClass(
   { type, target }: ClassRegistration,

@@ -20,12 +20,15 @@ type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
  * The input type class method decorator that registers a field for a type.
  *
  * @param options The field type options
+ * @typeParam TypeConstructor The constructor type associated with the {@linkcode Field} decorator.
+ * @typeParam Type The mapped type associated with the {@linkcode Field} decorator.
+ * @returns The {@linkcode Field} decorator function.
  */
 export function Field<
-  Constructor extends ClassType,
-  Type extends MapType<Constructor>,
+  TypeConstructor extends ClassType,
+  Type extends MapType<TypeConstructor>,
 >(
-  options: FieldOptions<Constructor>,
+  options: FieldOptions<TypeConstructor>,
 ): <Class>(
   this: unknown,
   _target: Class,
@@ -114,6 +117,7 @@ export interface FieldOptions<Type> {
  * If no schema is defined for the model, then an error will be thrown.
  *
  * @param target The target model to get the type information from.
+ * @typeParam Class The class type to get type info for.
  * @returns The type information
  */
 export function getTypeInfo<Class extends ClassType>(
@@ -157,6 +161,7 @@ export interface TypeInfo<Type extends z.ZodRawShape> {
  * The object type class decorator that registers a class as an object type.
  *
  * @param _options The object type options
+ * @returns The {@linkcode ObjectType} decorator function.
  */
 export function ObjectType(_options: ObjectTypeOptions): (
   target: ClassType,
@@ -183,12 +188,6 @@ export function ObjectType(_options: ObjectTypeOptions): (
 export interface ObjectTypeOptions {
   /**
    * The description of the object type.
-   *
-   * @example
-   * ```ts
-   * \@ObjectType({ description: "Object" })
-   * class Object {}
-   * ```
    */
   description: string;
 }
@@ -197,6 +196,7 @@ export interface ObjectTypeOptions {
  * The input type class decorator that registers a class as an input type.
  *
  * @param _options The input type options
+ * @returns The {@linkcode InputType} decorator function.
  */
 export function InputType(_options: InputTypeOptions): (
   target: ClassType,
@@ -224,12 +224,6 @@ export function InputType(_options: InputTypeOptions): (
 export interface InputTypeOptions {
   /**
    * The description of the input type.
-   *
-   * @example
-   * ```ts
-   * \@InputType({ description: "Input" })
-   * class Input {}
-   * ```
    */
   description: string;
 }

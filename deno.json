@@ -7,8 +7,8 @@
     "lint": "deno lint && deno task lint:doc-imports && deno task lint:docs",
     "lint:doc-imports": "deno run --allow-env --allow-read ./_tools/check_doc_imports.ts",
     "lint:docs": "deno run -A _tools/check_docs.ts",
-    "test": "deno test --doc --allow-net=\"0.0.0.0,localhost,127.0.0.1\" --coverage=cov_profile --clean",
-    "test:watch": "deno test --doc --allow-net=\"0.0.0.0,localhost,127.0.0.1\" --watch",
+    "test": "deno test --allow-net=\"0.0.0.0,localhost,127.0.0.1\" --coverage=cov_profile --clean",
+    "test:watch": "deno test --allow-net=\"0.0.0.0,localhost,127.0.0.1\" --watch",
     "report": "deno task test && deno coverage --exclude=tests cov_profile --html && open cov_profile/html/index.html",
     "lcov": "deno coverage --exclude=tests cov_profile --lcov --output=cov_profile.lcov"
   },

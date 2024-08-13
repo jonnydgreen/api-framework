@@ -7,6 +7,7 @@ import { assert, AssertionError } from "@std/assert";
  * This is useful when ensuring that all cases have been used.
  * @param _input The input (that should never be passed)
  * @param message A custom message to use when an input is passed
+ * @returns Nothing
  */
 export function assertNever(
   _input: never,

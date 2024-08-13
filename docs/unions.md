@@ -9,7 +9,7 @@ The following principles should be followed when designing the Union API:
 
 - [ ] Prefer explicitness over implicitness
 - [ ] Ensure maximum type-safety
-- [ ] Opionated API which encourages REST API / OpenAPI best practises
+- [ ] Opinionated API which encourages REST API / OpenAPI best practises
 - [ ] All of the information is needed to generate an OpenAPI spec compliant use
       of `oneOf`
 - [ ] [optional] Compliant with GraphQL
@@ -62,14 +62,16 @@ If anything is inputted which is not of the three types, a TypeScript error is
 emitted:
 
 ```typescript
-// Argument of type '() => Orange | Apple | JackFruit' is not assignable to parameter of type '(...args: any[]) => Orange | Apple'.
-@Post({ outputType: Union(Orange, Apple) })
-public getHelloUnion(): Orange | Apple | JackFruit {
-return {
-    __typename: "Orange",
-    ripeness: "ripe",
-    tang: "tangy",
-};
+export class Controller {
+  // Argument of type '() => Orange | Apple | JackFruit' is not assignable to parameter of type '(...args: any[]) => Orange | Apple'.
+  @Post({ outputType: Union(Orange, Apple) })
+  public getHelloUnion(): Orange | Apple | JackFruit {
+    return {
+      __typename: "Orange",
+      ripeness: "ripe",
+      tang: "tangy",
+    };
+  }
 }
 ```
 
@@ -110,18 +112,23 @@ This is because we want developers to be able to return primitive objects which
 correspond to the `ObjectType`s they defined.
 
 ```typescript
-@Post({ outputType: Union(Orange, Apple, JackFruit), resolverFunc: (type) => {
-  // Not needed! We can infer this from `__typename`
-  if ("ripeness" in type) {
-    return Orange
-  }
-} })
+export class Controller {
+  @Post({
+    outputType: Union(Orange, Apple, JackFruit),
+    resolverFunc: (type) => {
+      // Not needed! We can infer this from `__typename`
+      if ("ripeness" in type) {
+        return Orange;
+      }
+    },
+  })
   public getHelloUnion(): Orange | Apple | JackFruit {
     return {
       ripeness: "ripe",
       tang: "tangy",
     };
   }
+}
 ```
 
 - [__typename is used in grapqhql clients](https://graphql.com/learn/interfaces-and-unions/#__typename),

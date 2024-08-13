@@ -45,7 +45,9 @@ export function getControllerMetadataByRoute(
 const routes = new Map<symbol, RouteMetadata>();
 
 /**
- * Get route metadata by controller key.
+ * Get {@linkcode RouteMetadata} by controller key.
+ * @param controllerKey The controller key to get the {@linkcode RouteMetadata} by.
+ * @returns The {@linkcode RouteMetadata} filtered by the controller key.
  */
 export function getRouteMetadataByController(
   controllerKey: symbol,
@@ -138,6 +140,7 @@ export interface RouteMetadata {
  * Note, this will not work for private or static properties.
  *
  * @param options The options for registering a GET route.
+ * @typeParam ResponseType The response type of the GET route.
  * @returns a decorator that will register the GET route
  */
 export function Get<ResponseType>(
@@ -208,6 +211,8 @@ export type GetMethodDecorator<ResponseType> = (
  * Note, this will not work for private or static properties.
  *
  * @param options The options for registering a POST route.
+ * @typeParam RequestBody The request body type of the POST route.
+ * @typeParam ResponseType The response type of the POST route.
  * @returns a decorator that will register the POST route
  */
 export function Post<RequestBody, ResponseType>(

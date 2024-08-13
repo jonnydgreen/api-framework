@@ -18,15 +18,15 @@ export class Application {
   /**
    * The options of the {@linkcode Application}
    */
-  public readonly options: Readonly<ApplicationOptions>;
+  readonly options: Readonly<ApplicationOptions>;
   /**
    * The logger used by the {@linkcode Application}
    */
-  public readonly log: Readonly<Logger>;
+  readonly log: Readonly<Logger>;
   /**
    * The server context of the {@linkcode Application}
    */
-  public readonly ctx: Readonly<ServerContext>;
+  readonly ctx: Readonly<ServerContext>;
 
   readonly #driver: Readonly<Driver>;
   readonly #versions = new Map<string, ApplicationVersionOptions>();
@@ -34,6 +34,8 @@ export class Application {
   /**
    * A class which starts the API applications and allows one to register
    * routes and capabilities to process inbound requests against.
+   *
+   * @param options The options used to start the {@linkcode Application}.
    */
   constructor(options?: ApplicationOptions) {
     // Driver
@@ -59,15 +61,16 @@ export class Application {
    * Register a version of an API.
    * @param options - The required options to register an API version.
    */
-  public registerVersion(options: ApplicationVersionOptions): void {
+  registerVersion(options: ApplicationVersionOptions): void {
     this.#versions.set(options.version, options);
   }
 
   /**
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
+   * @returns The {@linkcode ApplicationServer} that is being listened on.
    */
-  public async listen(
+  async listen(
     options?: ApplicationListenOptions,
   ): Promise<ApplicationServer> {
     // Build container to ensure all decorators have been called
