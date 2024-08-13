@@ -3,11 +3,14 @@
 // TODO(jonnydgreen): doc-strings with full examples
 
 import { assert } from "@std/assert";
-import type { ApplicationListenOptions } from "../application.ts";
+import type {
+  ApplicationListenOptions,
+  ApplicationServer,
+} from "../application.ts";
 import { Context, type ServerContext } from "../context.ts";
 import { buildErrorResponse, processResponse } from "../response.ts";
 import type { ControllerRoute } from "../router.ts";
-import type { Driver, Server } from "./driver.ts";
+import type { Driver } from "./driver.ts";
 import { STATUS_CODE, type StatusCode } from "jsr:@std/http@^0.224.5/status";
 import type { MaybePromise } from "../utils.ts";
 
@@ -38,7 +41,7 @@ export class CoreDriverAdapter implements Driver {
 
   public listen(
     options: Required<ApplicationListenOptions>,
-  ): Server {
+  ): ApplicationServer {
     const onListen = this.#onListen.bind(this);
     const handler = this.#handler.bind(this);
     return Deno.serve({

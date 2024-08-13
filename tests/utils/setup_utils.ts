@@ -1,11 +1,10 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-import { Application } from "../../application.ts";
-import type { Server } from "../../drivers/driver.ts";
+import { Application, type ApplicationServer } from "../../application.ts";
 import type { ClassType } from "../../utils.ts";
 
 export async function setupApplication(controllers: ClassType[]): Promise<[
   application: Application,
-  server: Server,
+  server: ApplicationServer,
   origin: URL,
 ]> {
   const app = new Application({ logLevel: "CRITICAL" });
@@ -20,7 +19,7 @@ export async function setupApplication(controllers: ClassType[]): Promise<[
   return [app, server, origin];
 }
 
-export function buildServerOrigin(server: Server): URL {
+export function buildServerOrigin(server: ApplicationServer): URL {
   return new URL(`http://${server.addr.hostname}:${server.addr.port}`);
 }
 

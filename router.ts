@@ -1,10 +1,14 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assert, assertExists } from "@std/assert";
+import { assert } from "@std/assert";
 import { join } from "@std/path/join";
 import { type Container, getContainerClassMethod } from "./container.ts";
 import type { Context } from "./context.ts";
-import { controllers, type RouteMetadata, routes } from "./decorators.ts";
+import {
+  getControllerMetadataByRoute,
+  getRouteMetadataByController,
+  type RouteMetadata,
+} from "./decorators.ts";
 import {
   ClassRegistrationType,
   getClassRegistrationByKey,
@@ -36,35 +40,42 @@ export function buildControllerRoutes(
 ): ControllerRoute[] {
   const controllerRoutes: ControllerRoute[] = [];
   const controllerKey = getRegistrationKey(controller);
-  const filteredRoutes = [...routes.values()].filter((route) =>
-    route.controller === controllerKey
-  );
+  const filteredRoutes = getRouteMetadataByController(controllerKey);
   for (const route of filteredRoutes) {
     const routeHandler = getContainerClassMethod(
       container,
       route.controller,
-      route.propertyName as string,
+      route.methodName as string,
     );
-    const controller = controllers.get(route.controller);
-    assertExists(
-      controller,
-      `Controller ${
-        String(route.controller)
-      } does not exist for route: ${route.method}`,
-    );
+    const controller = getControllerMetadataByRoute(route);
     controllerRoutes.push({
       method: route.method,
       path: buildRoutePath(version, controller.path, route.path),
-      handler: buildHandler(route, routeHandler),
+      handler: buildRouteHandler(route, routeHandler),
     });
   }
   return controllerRoutes;
 }
 
-// TODO: doc string
-function buildHandler(
+/**
+ * Built a route handler.
+ *
+ * If the request contains an input body, it attempts to get the
+ * associated class. If none is found or registered, an error is thrown.
+ *
+ * The returned handler will do the following:
+ *  - Deserialise the request body.
+ *  - Run the method handler.
+ *    - Any errors are caught and the error response is set accordingly.
+ *  - Process the response.
+ *
+ * @param route The route metadata
+ * @param methodHandler The method handler that will handle the request
+ * @returns
+ */
+function buildRouteHandler(
   route: RouteMetadata,
-  handler: MethodHandler,
+  methodHandler: MethodHandler,
 ): RouteHandler {
   let bodyClass: ClassType | undefined = undefined;
   if (route.body) {
@@ -85,7 +96,7 @@ function buildHandler(
     let response: [object | BodyInit | null, ResponseInit | undefined];
     try {
       const body = await deserialiseRequestBody(bodyClass, ctx.request);
-      const result = await handler(ctx, params, body);
+      const result = await methodHandler(ctx, params, body);
       response = [result, undefined];
     } catch (error) {
       response = buildErrorResponse(ctx, error);
@@ -94,7 +105,18 @@ function buildHandler(
   };
 }
 
-// TODO: doc string
+/**
+ * Deserialise the request body from input request.
+ *
+ * When there is an associated target prototype and body for
+ * the request, the input is parsed into a JSON object and
+ * assigned to the instantiated target.
+ *
+ * If there is no text or target to use, nothing is returned.
+ * @param target
+ * @param request
+ * @returns
+ */
 async function deserialiseRequestBody(
   target: ClassType | undefined,
   request: Request,
@@ -110,11 +132,21 @@ async function deserialiseRequestBody(
   return Object.assign(new target(), json);
 }
 
-// TODO: doc string
+/**
+ * A route path for a URL. It always starts with: `/`
+ */
+export type RoutePath = `/${string}`;
+
+/**
+ * Build a route path from the defined paths.
+ *
+ * @param pathParts The input path parts
+ * @returns The built route path
+ */
 function buildRoutePath(
-  ...paths: string[]
-): `/${string}` {
-  const pathname = join("/", ...paths).replaceAll("\\", "/").replace(
+  ...pathParts: string[]
+): RoutePath {
+  const pathname = join("/", ...pathParts).replaceAll("\\", "/").replace(
     /\/+$/,
     "",
   )
@@ -122,7 +154,7 @@ function buildRoutePath(
       /^\/+/,
       "/",
     );
-  return pathname as `/${string}`;
+  return pathname as RoutePath;
 }
 
 /**
@@ -169,9 +201,9 @@ export interface ControllerRoute {
    */
   method: HttpMethod;
   /**
-   * The HTTP path of the controller route.
+   * The route path of the controller route.
    */
-  path: `/${string}`;
+  path: RoutePath;
   /**
    * The handler for the controller route.
    */

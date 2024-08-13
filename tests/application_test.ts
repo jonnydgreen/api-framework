@@ -9,14 +9,14 @@ import {
   assertThrows,
 } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
-import { Application } from "../application.ts";
+import { Application, type ApplicationServer } from "../application.ts";
 import type { Injectable, InjectableRegistration } from "../registration.ts";
 import { ServerContext } from "../context.ts";
 import { Controller, Get } from "../decorators.ts";
 import { HttpMethod } from "../router.ts";
 import { buildServerOrigin, setupPermissions } from "./utils/setup_utils.ts";
 import { teardownServer } from "./utils/teardown_utils.ts";
-import { DriverStrategy, type Server } from "../drivers/driver.ts";
+import { DriverStrategy } from "../drivers/driver.ts";
 import { CoreDriverAdapter } from "../drivers/core_adapter.ts";
 import { Logger } from "../logger.ts";
 
@@ -144,7 +144,7 @@ Deno.test({
       controllers: [MessageController],
     });
     const defaultPort = 8080;
-    let conflictingServer: Server | undefined = undefined;
+    let conflictingServer: ApplicationServer | undefined = undefined;
     try {
       conflictingServer = await conflictingApp.listen({ port: defaultPort });
     } catch {

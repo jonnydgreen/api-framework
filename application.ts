@@ -3,9 +3,9 @@
 // TODO(jonnydgreen): doc-strings with full examples
 
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
-import { type Driver, DriverStrategy, type Server } from "./drivers/driver.ts";
+import { type Driver, DriverStrategy } from "./drivers/driver.ts";
 import { ServerContext } from "./context.ts";
-import { buildContainer, registerContainerClassMethods } from "./container.ts";
+import { buildContainer, setupContainerClass } from "./container.ts";
 import { buildControllerRoutes } from "./router.ts";
 import { assertNever, type ClassType } from "./utils.ts";
 import type { LevelName, Logger } from "./logger.ts";
@@ -15,13 +15,26 @@ import type { LevelName, Logger } from "./logger.ts";
  * routes and capabilities to process inbound requests against.
  */
 export class Application {
+  /**
+   * The options of the {@linkcode Application}
+   */
   public readonly options: Readonly<ApplicationOptions>;
+  /**
+   * The logger used by the {@linkcode Application}
+   */
   public readonly log: Readonly<Logger>;
+  /**
+   * The server context of the {@linkcode Application}
+   */
   public readonly ctx: Readonly<ServerContext>;
 
   readonly #driver: Readonly<Driver>;
   readonly #versions = new Map<string, ApplicationVersionOptions>();
 
+  /**
+   * A class which starts the API applications and allows one to register
+   * routes and capabilities to process inbound requests against.
+   */
   constructor(options?: ApplicationOptions) {
     // Driver
     const defaultDriver = DriverStrategy.Core;
@@ -54,13 +67,15 @@ export class Application {
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
    */
-  public async listen(options?: ApplicationListenOptions): Promise<Server> {
+  public async listen(
+    options?: ApplicationListenOptions,
+  ): Promise<ApplicationServer> {
     // Build container to ensure all decorators have been called
     // Once built, register all the routes for each version
     const container = await buildContainer(this.ctx);
     for (const [version, { controllers }] of this.#versions) {
       for (const controller of controllers) {
-        registerContainerClassMethods(container, controller);
+        setupContainerClass(container, controller);
         const controllerRoutes = buildControllerRoutes(
           container,
           version,
@@ -100,8 +115,36 @@ export class Application {
  * The Application Options for {@linkcode Application}
  */
 export interface ApplicationOptions {
+  /**
+   * The driver used by the {@linkcode Application} to handle HTTP traffic.
+   * @default DriverStrategy.Core
+   */
   driver?: DriverStrategy | Driver;
+  /**
+   * The log level used by the {@linkcode Logger} within the {@linkcode Application}.
+   */
   logLevel?: LevelName;
+}
+
+/**
+ * The server returned by {@linkcode Application.listen}.
+ */
+export interface ApplicationServer {
+  /**
+   * A promise that resolves once server finishes.
+   */
+  finished: Promise<void>;
+
+  /**
+   * Gracefully close the server. No more new connections will be accepted,
+   * while pending requests will be allowed to finish.
+   */
+  shutdown(): Promise<void>;
+
+  /**
+   * The local address this server is listening on.
+   */
+  addr: Deno.NetAddr;
 }
 
 /**

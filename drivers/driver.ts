@@ -1,30 +1,38 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-// TODO(jonnydgreen): doc-strings with full examples
+// TODO(jonnydgreen): examples
 
-import type { ApplicationListenOptions } from "../application.ts";
+import type {
+  ApplicationListenOptions,
+  ApplicationServer,
+} from "../application.ts";
 import type { ControllerRoute } from "../router.ts";
 
+/**
+ * The driver strategy.
+ */
 export const enum DriverStrategy {
+  /**
+   * The core driver strategy.
+   */
   Core = "Core",
-}
-
-export interface Server {
-  finished: Promise<void>;
-  shutdown(): Promise<void>;
-  addr: Deno.NetAddr;
 }
 
 /**
  * The Driver Adaptor interface that all adaptors implement.
  */
 export interface Driver {
+  /**
+   * Register a controller route.
+   * @param route The controller route input.
+   */
   registerRoute(route: ControllerRoute): void;
+
   /**
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
    */
-  listen(options: Required<ApplicationListenOptions>): Server;
+  listen(options: Required<ApplicationListenOptions>): ApplicationServer;
 }
 
 /**

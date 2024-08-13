@@ -18,6 +18,9 @@ import {
 } from "./registration.ts";
 
 // TODO(jonnydgreen): make our own container
+/**
+ * The container of all injectables that can be used in the DI framework.
+ */
 export type Container = InversifyContainer;
 
 interface IMetadata {
@@ -30,11 +33,28 @@ const metadata: IMetadata = {
   inject: {},
 };
 
+/**
+ * Make an injectable target by decorating the target with necessary metadata
+ * @param target The target to make an injectable
+ */
 function makeInjectable(target: ClassType): void {
   decorate(injectable(), target);
 }
 
-export function registerSingleton<T>(
+/**
+ * Register a singleton for a given target and dependencies.
+ *
+ * First, the target is registered, then the dependencies are registered with this class.
+ * Once complete, the target is bound to the given symbol as a singleton. A.k.a only
+ * instantiated once for the lifetime of the container.
+ *
+ * @param container
+ * @param type
+ * @param target
+ * @param types
+ * @returns
+ */
+function registerSingleton<T>(
   container: Container,
   type: symbol,
   target: ClassType<T>,
@@ -55,6 +75,14 @@ export function registerSingleton<T>(
   return container.bind<T>(type).to(target).inSingletonScope();
 }
 
+/**
+ * Build the {@linkcode Container} by running the registrations for each registered class.
+ *
+ * If a registration is unsupported, an error will be thrown.
+ *
+ * @param ctx The server context.
+ * @returns The built container
+ */
 export async function buildContainer(ctx: ServerContext): Promise<Container> {
   ctx.log.debug("Building server container");
   const container = new InversifyContainer();
@@ -84,11 +112,22 @@ export async function buildContainer(ctx: ServerContext): Promise<Container> {
   return container;
 }
 
+/**
+ * A container error that can be throw when building the container in {@linkcode buildContainer}.
+ */
 export class ContainerError extends Error {
+  /**
+   * The name of the error.
+   */
   override readonly name = "ContainerError";
 }
 
-export function registerContainerClassMethods<T>(
+/**
+ * Setup the container class by instantiating it.
+ * @param container The container containing the class to instantiate
+ * @param target The class to instantiate. This must be registered within the system.
+ */
+export function setupContainerClass<T>(
   container: Container,
   target: ClassType<T>,
 ): void {
@@ -96,14 +135,27 @@ export function registerContainerClassMethods<T>(
   container.get<T>(key);
 }
 
+/**
+ * Get an instantiated class method from the built container.
+ *
+ * If not method exists, an error will be thrown.
+ *
+ * @param container The container to fetch the class method from.
+ * @param targetKey The key of the instantiated class in the container.
+ * @param methodName The method name of the instantiated class.
+ * @returns The instantiated class method.
+ */
 export function getContainerClassMethod<T>(
   container: Container,
   targetKey: symbol,
-  propertyName: keyof T,
+  methodName: keyof T,
 ): Fn {
   const registeredTarget = container.get<T>(targetKey);
-  const fn = registeredTarget[propertyName];
-  assertFunction(fn);
+  const fn = registeredTarget[methodName];
+  assertFunction(
+    fn,
+    `No method ${String(methodName)} exists for class: ${String(targetKey)}`,
+  );
   return fn.bind(registeredTarget);
 }
 
