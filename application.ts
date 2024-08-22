@@ -3,28 +3,69 @@
 import { CoreDriverAdapter } from "./drivers/core_adapter.ts";
 import { type Driver, DriverStrategy } from "./drivers/driver.ts";
 import { ServerContext } from "./context.ts";
-import { buildContainer, setupContainerClass } from "./container.ts";
+import { Container } from "./container.ts";
 import { buildControllerRoutes } from "./router.ts";
 import { assertNever, type ClassType } from "./utils.ts";
-import type { LevelName, Logger } from "./logger.ts";
+import type { LevelName } from "./logger.ts";
 
 /**
  * A class which starts the API applications and allows one to register
  * routes and capabilities to process inbound requests against.
+ *
+ * @example Usage
+ * ```ts no-eval
+ * import { Application } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ * import { MessageController } from "./examples/basic/basic_controller.ts"
+ *
+ * const app = new Application();
+ *
+ * app.registerVersion({
+ *   version: "v1",
+ *   controllers: [MessageController],
+ * });
+ *
+ * const server = await app.listen();
+ * assert(server);
+ * ```
  */
 export class Application {
   /**
    * The options of the {@linkcode Application}
+   * @example Usage
+   * ```ts
+   * import { Application, DriverStrategy } from "@eyrie/app";
+   * import { assertEquals } from "@std/assert";
+   *
+   * const app = new Application();
+   * assertEquals(app.options.logLevel, "INFO")
+   * assertEquals(app.options.driver, DriverStrategy.Core)
+   * ```
    */
   readonly options: Readonly<ApplicationOptions>;
   /**
-   * The logger used by the {@linkcode Application}
-   */
-  readonly log: Readonly<Logger>;
-  /**
    * The server context of the {@linkcode Application}
+   * @example Usage
+   * ```ts no-assert
+   * import { Application } from "@eyrie/app";
+   *
+   * const app = new Application();
+   * app.ctx.log.info("Hello")
+   * ```
    */
   readonly ctx: Readonly<ServerContext>;
+
+  /**
+   * The {@linkcode Container} of all injectables that can be used in the DI framework.
+   * @example Usage
+   * ```ts no-assert
+   * import { Application } from "@eyrie/app";
+   *
+   * const app = new Application();
+   * await app.container.build(app.ctx)
+   * ```
+   */
+  readonly container: Readonly<Container>;
 
   readonly #driver: Readonly<Driver>;
   readonly #versions = new Map<string, ApplicationVersionOptions>();
@@ -51,13 +92,26 @@ export class Application {
     };
     this.options = { ...defaultOptions, ...options };
     this.ctx = new ServerContext(logLevel);
-    this.log = this.ctx.log;
+    this.container = new Container();
     this.#driver = this.#setupDriver(driver);
   }
 
   /**
    * Register a version of an API.
    * @param options - The required options to register an API version.
+   * @example Usage
+   * ```ts no-eval no-assert
+   * import { Application } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   * import { MessageController } from "./examples/basic/basic_controller.ts"
+   *
+   * const app = new Application();
+   *
+   * app.registerVersion({
+   *   version: "v1",
+   *   controllers: [MessageController],
+   * });
+   * ```
    */
   registerVersion(options: ApplicationVersionOptions): void {
     this.#versions.set(options.version, options);
@@ -67,18 +121,34 @@ export class Application {
    * Start listening for requests, processing registered routes for each request.
    * @param options - The required options to start listening for requests.
    * @returns The {@linkcode ApplicationServer} that is being listened on.
+   * @example Usage
+   * ```ts no-eval
+   * import { Application } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   * import { MessageController } from "./examples/basic/basic_controller.ts"
+   *
+   * const app = new Application();
+   *
+   * app.registerVersion({
+   *   version: "v1",
+   *   controllers: [MessageController],
+   * });
+   *
+   * const server = await app.listen();
+   * assert(server);
+   * ```
    */
   async listen(
     options?: ApplicationListenOptions,
   ): Promise<ApplicationServer> {
     // Build container to ensure all decorators have been called
     // Once built, register all the routes for each version
-    const container = await buildContainer(this.ctx);
+    await this.container.build(this.ctx);
     for (const [version, { controllers }] of this.#versions) {
       for (const controller of controllers) {
-        setupContainerClass(container, controller);
+        this.container.setupClass(controller);
         const controllerRoutes = buildControllerRoutes(
-          container,
+          this.container,
           version,
           controller,
         );

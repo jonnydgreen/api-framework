@@ -2,7 +2,7 @@
 
 import { assert } from "@std/assert";
 import { join } from "@std/path/join";
-import { type Container, getContainerClassMethod } from "./container.ts";
+import type { Container } from "./container.ts";
 import type { Context } from "./context.ts";
 import {
   getControllerMetadataByRoute,
@@ -26,26 +26,27 @@ import type { ClassType, MaybePromise } from "./utils.ts";
  *
  * If a route controller cannot be found, an error will be thrown.
  *
- * @param container The container to fetch the route handlers from.
+ * @param container The readonly {@linkcode Container} to fetch the route handlers from.
  * @param version The version to register the controller for.
  * @param controller The controller to register routes for
  * @returns All the registered controller routes.
  *
  * @example Usage
- * ```ts no-eval
- * import { ServerContext, buildControllerRoutes, buildContainer } from "@eyrie/app";
+ * ```ts
+ * import { ServerContext, Container, buildControllerRoutes } from "@eyrie/app";
  * import { assert } from "@std/assert";
+ * import { MessageController } from "./examples/basic/basic_controller.ts"
  *
  * const ctx = new ServerContext("INFO");
- * const container = await buildContainer(ctx);
- * class MessageController {}
- *
+ * const container = new Container
+ * await container.build(ctx);
+ * container.setupClass(MessageController);
  * const routes = buildControllerRoutes(container, "v1", MessageController);
  * assert(routes.length);
  * ```
  */
 export function buildControllerRoutes(
-  container: Container,
+  container: Readonly<Container>,
   version: string,
   controller: ClassType,
 ): ControllerRoute[] {
@@ -53,8 +54,7 @@ export function buildControllerRoutes(
   const controllerKey = getRegistrationKey(controller);
   const filteredRoutes = getRouteMetadataByController(controllerKey);
   for (const route of filteredRoutes) {
-    const routeHandler = getContainerClassMethod(
-      container,
+    const routeHandler = container.getClassMethod(
       route.controller,
       route.methodName as string,
     );

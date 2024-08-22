@@ -15,6 +15,7 @@
   "lock": false,
   "imports": {
     "@deno/doc": "jsr:@deno/doc@0.137",
+    "reflect-metadata": "npm:reflect-metadata@^0.2.2",
     "inversify": "npm:inversify@^6.0.2",
     "typescript": "npm:typescript@^5.4.5",
     "zod": "https://deno.land/x/zod@v3.23.8/mod.ts",

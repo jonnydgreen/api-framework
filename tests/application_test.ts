@@ -33,8 +33,8 @@ Deno.test({
       logLevel: "INFO",
     });
     assertInstanceOf(app.ctx, ServerContext);
-    assertInstanceOf(app.log, Logger);
-    assertStrictEquals(app.log.levelName, "INFO");
+    assertInstanceOf(app.ctx.log, Logger);
+    assertStrictEquals(app.ctx.log.levelName, "INFO");
   },
 });
 

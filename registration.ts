@@ -5,9 +5,8 @@ import { assertFunction, type ClassType, type MaybePromise } from "./utils.ts";
 
 const registerFnName = "register";
 
-// TODO(jonnydgreen): rename this, it is confusing
 /**
- * Run the registration of an injectable to fully register it within the
+ * Get the registration definition of an injectable to fully register it within the
  * system and make it ready to be used.
  *
  * An assertion error will be thrown if the class
@@ -16,8 +15,18 @@ const registerFnName = "register";
  * @param ctx Server Context
  * @param target The class to run the registration for.
  * @returns Registration definition
+ * @example Usage
+ * ```ts
+ * import { getRegistrationDefinition, ServerContext } from "@eyrie/app";
+ * import { assertExists } from "@std/assert";
+ * import { MessageController } from "./examples/basic/basic_controller.ts";
+ *
+ * const ctx = new ServerContext("INFO");
+ * const registration = await getRegistrationDefinition(ctx, MessageController);
+ * assertExists(registration.dependencies);
+ * ```
  */
-export function runRegistration(
+export function getRegistrationDefinition(
   ctx: ServerContext,
   target: ClassType,
 ): InjectableRegistration | Promise<InjectableRegistration> {
@@ -38,6 +47,13 @@ const classRegistrations = new Map<symbol, ClassRegistration>();
  * Clear class registration. This is predominantly used for testing purposes.
  * @param target The class to clear
  * @typeParam T The type of the Class.
+ * @example Usage
+ * ```ts no-assert
+ * import { clearRegistration } from "@eyrie/app";
+ * import { MessageController } from "./examples/basic/basic_controller.ts";
+ *
+ * clearRegistration(MessageController);
+ * ```
  */
 export function clearRegistration<T>(
   target: ClassType<T>,
@@ -80,6 +96,14 @@ export interface ClassRegistration {
  *
  * @param type The optional type of class registrations to fetch by.
  * @returns The class registrations and their key as an array of tuples
+ * @example Usage
+ * ```ts no-eval
+ * import { getClassRegistrations } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const registrations = getClassRegistrations();
+ * assert(registrations.length);
+ * ```
  */
 export function getClassRegistrations(
   type?: ClassRegistrationType,
@@ -101,6 +125,17 @@ const typeKey = Symbol("class.type.key");
  * @param type The type of registration. This allows one to use a class for specific purposes.
  * @param target The target to register.
  * @returns The symbol used to register the class
+ * @example Usage
+ * ```ts
+ * import { registerClass, ClassRegistrationType } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ * import { Message } from "./examples/basic/basic_model.ts";
+ *
+ * const type = ClassRegistrationType.ObjectType;
+ * const target = Message;
+ * const key = registerClass({ type, target });
+ * assert(typeof key === 'symbol');
+ * ```
  */
 export function registerClass(
   { type, target }: ClassRegistration,
@@ -117,6 +152,19 @@ export function registerClass(
  *
  * @param key The registration to find the class registration with.
  * @returns The class registration
+ * @example Usage
+ * ```ts
+ * import { getClassRegistrationByKey, registerClass, ClassRegistrationType } from "@eyrie/app";
+ * import { assertExists } from "@std/assert";
+ * import { Message } from "./examples/basic/basic_model.ts";
+ *
+ * const type = ClassRegistrationType.ObjectType;
+ * const target = Message;
+ * const key = registerClass({ type, target });
+ *
+ * const classRegistration = getClassRegistrationByKey(key);
+ * assertExists(classRegistration);
+ * ```
  */
 export function getClassRegistrationByKey(key: symbol): ClassRegistration {
   const target = classRegistrations.get(key);
@@ -132,6 +180,19 @@ export function getClassRegistrationByKey(key: symbol): ClassRegistration {
  *
  * @param target The target to get the key from
  * @returns The key
+ * @example Usage
+ * ```ts
+ * import { getRegistrationKey, registerClass, ClassRegistrationType } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ * import { Message } from "./examples/basic/basic_model.ts";
+ *
+ * const type = ClassRegistrationType.ObjectType;
+ * const target = Message;
+ * const key = registerClass({ type, target });
+ *
+ * const foundKey = getRegistrationKey(Message);
+ * assert(foundKey === key);
+ * ```
  */
 export function getRegistrationKey(target: unknown): symbol {
   const key = maybeGetRegistrationKey(target);
@@ -150,6 +211,20 @@ export function getRegistrationKey(target: unknown): symbol {
  *
  * @param target The target to get the key from
  * @returns The key (if found)
+ * @example Usage
+ * ```ts
+ * import { maybeGetRegistrationKey, registerClass, ClassRegistrationType } from "@eyrie/app";
+ * import { assert, assertExists } from "@std/assert";
+ * import { Message } from "./examples/basic/basic_model.ts";
+ *
+ * const type = ClassRegistrationType.ObjectType;
+ * const target = Message;
+ * const key = registerClass({ type, target });
+ *
+ * const foundKey = maybeGetRegistrationKey(Message);
+ * assertExists(foundKey);
+ * assert(foundKey === key);
+ * ```
  */
 export function maybeGetRegistrationKey(target: unknown): symbol | undefined {
   return (target as Record<symbol, symbol | undefined>)[typeKey];

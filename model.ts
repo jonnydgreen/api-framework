@@ -23,6 +23,15 @@ type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
  * @typeParam TypeConstructor The constructor type associated with the {@linkcode Field} decorator.
  * @typeParam Type The mapped type associated with the {@linkcode Field} decorator.
  * @returns The {@linkcode Field} decorator function.
+ * @example Usage
+ * ```ts no-assert
+ * import { ObjectType, Field } from "@eyrie/app";
+ * @ObjectType({ description: "Message" })
+ * class Message {
+ *   @Field({ description: "Content of the Message.", type: String })
+ *   content!: string;
+ * }
+ * ```
  */
 export function Field<
   TypeConstructor extends ClassType,
@@ -120,7 +129,7 @@ export interface FieldOptions<Type> {
  * @typeParam Class The class type to get type info for.
  * @returns The type information
  */
-export function getTypeInfo<Class extends ClassType>(
+function getTypeInfo<Class extends ClassType>(
   target: Class | Fn,
 ): TypeInfo<InstanceType<Class>> {
   const key = getRegistrationKey(target);
@@ -162,6 +171,15 @@ export interface TypeInfo<Type extends z.ZodRawShape> {
  *
  * @param _options The object type options
  * @returns The {@linkcode ObjectType} decorator function.
+ * @example Usage
+ * ```ts no-assert
+ * import { ObjectType, Field } from "@eyrie/app";
+ * @ObjectType({ description: "Message" })
+ * class Message {
+ *   @Field({ description: "Content of the Message.", type: String })
+ *   content!: string;
+ * }
+ * ```
  */
 export function ObjectType(_options: ObjectTypeOptions): (
   target: ClassType,
@@ -197,6 +215,15 @@ export interface ObjectTypeOptions {
  *
  * @param _options The input type options
  * @returns The {@linkcode InputType} decorator function.
+ * @example Usage
+ * ```ts no-assert
+ * import { InputType, Field } from "@eyrie/app";
+ * @InputType({ description: "Message" })
+ * class MessageInput {
+ *   @Field({ description: "Content of the Message.", type: String })
+ *   content!: string;
+ * }
+ * ```
  */
 export function InputType(_options: InputTypeOptions): (
   target: ClassType,

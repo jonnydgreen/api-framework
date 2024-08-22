@@ -28,6 +28,20 @@ const controllers = new Map<symbol, ControllerMetadata>();
  * If no controller is found, an error will be thrown.
  * @param route The route metadata used to find the controller.
  * @returns The found controller.
+ *
+ * @example Usage
+ * ```ts no-assert no-eval
+ * import { getControllerMetadataByRoute, RouteMetadata, HttpMethod } from "@eyrie/app";
+ *
+ * const route: RouteMetadata = {
+ *   controller: Symbol('controller'),
+ *   method: HttpMethod.GET,
+ *   methodName: 'getMessages',
+ *   path: '/messages',
+ * };
+ *
+ * getControllerMetadataByRoute(route);
+ * ```
  */
 export function getControllerMetadataByRoute(
   route: RouteMetadata,
@@ -48,6 +62,14 @@ const routes = new Map<symbol, RouteMetadata>();
  * Get {@linkcode RouteMetadata} by controller key.
  * @param controllerKey The controller key to get the {@linkcode RouteMetadata} by.
  * @returns The {@linkcode RouteMetadata} filtered by the controller key.
+ * @example Usage
+ * ```ts no-assert
+ * import { getRouteMetadataByController } from "@eyrie/app";
+ *
+ * const key = Symbol('Controller key');
+ *
+ * getRouteMetadataByController(key);
+ * ```
  */
 export function getRouteMetadataByController(
   controllerKey: symbol,
@@ -67,6 +89,20 @@ export function getRouteMetadataByController(
  * @param path The base path of the controller. Note, this should not include the version,
  * this is separately registered for groups of controllers in `Application.registerVersion`.
  * @returns a decorator that will register the controller.
+ * @example Usage
+ * ```ts no-assert
+ * import { Controller, Get, Injectable, InjectableRegistration } from "@eyrie/app";
+ * @Controller('/messages')
+ * class MessageController implements Injectable {
+ *   register(): InjectableRegistration {
+ *     return { dependencies: [] };
+ *   }
+ *   @Get({ path: "/" })
+ *   public getMessages(): string[] {
+ *     return ["Hello", "Hiya"];
+ *   }
+ * }
+ * ```
  */
 export function Controller(path: RoutePath): InjectableDecorator {
   function controllerDecorator(
@@ -86,6 +122,20 @@ export function Controller(path: RoutePath): InjectableDecorator {
  * Register a Service for use within the DI framework.
  *
  * @returns a decorator that will register the service.
+ * @example Usage
+ * ```ts no-assert
+ * import { Service, Injectable, InjectableRegistration } from "@eyrie/app";
+ *
+ * @Service()
+ * class MessageService implements Injectable {
+ *   register(): InjectableRegistration {
+ *     return { dependencies: [] };
+ *   }
+ *   public getMessages(): string[] {
+ *     return ["Hello", "Hiya"];
+ *   }
+ * }
+ * ```
  */
 export function Service(): InjectableDecorator {
   function serviceDecorator(
@@ -142,6 +192,20 @@ export interface RouteMetadata {
  * @param options The options for registering a GET route.
  * @typeParam ResponseType The response type of the GET route.
  * @returns a decorator that will register the GET route
+ * @example Usage
+ * ```ts no-assert
+ * import { Controller, Get, Injectable, InjectableRegistration } from "@eyrie/app";
+ * @Controller('/messages')
+ * class MessageController implements Injectable {
+ *   register(): InjectableRegistration {
+ *     return { dependencies: [] };
+ *   }
+ *   @Get({ path: "/" })
+ *   public getMessages(): string[] {
+ *     return ["Hello", "Hiya"];
+ *   }
+ * }
+ * ```
  */
 export function Get<ResponseType>(
   options: GetOptions<ResponseType>,
@@ -213,6 +277,21 @@ export type GetMethodDecorator<ResponseType> = (
  * @typeParam RequestBody The request body type of the POST route.
  * @typeParam ResponseType The response type of the POST route.
  * @returns a decorator that will register the POST route
+ * @example Usage
+ * ```ts no-assert
+ * import { Controller, Post, Injectable, InjectableRegistration } from "@eyrie/app";
+ *
+ * @Controller('/messages')
+ * class MessageController implements Injectable {
+ *   register(): InjectableRegistration {
+ *     return { dependencies: [] };
+ *   }
+ *   @Post({ path: "/" })
+ *   public createMessage(): void {
+ *     // Create message
+ *   }
+ * }
+ * ```
  */
 export function Post<RequestBody, ResponseType>(
   options: PostOptions<ClassType<RequestBody>, ResponseType>,

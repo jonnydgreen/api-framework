@@ -16,6 +16,7 @@ import {
   type DocNodeInterface,
   type DocNodeModuleDoc,
   type JsDoc,
+  type JsDocTag,
   type JsDocTagDocRequired,
   type Location,
   type TsTypeDef,
@@ -184,10 +185,25 @@ function assertSnippetsWork(
   }
 }
 
+function buildTags(tags: JsDocTag[] = []): JsDocTag[] {
+  const mergedTags: JsDocTag[] = [];
+  for (const tag of tags) {
+    if (tag.kind !== "unsupported") {
+      mergedTags.push(tag);
+    } else if (tag.value.startsWith("@")) {
+      const lastTag = mergedTags[mergedTags.length - 1];
+      if (lastTag?.kind === "example") {
+        lastTag.doc += "\n" + tag.value;
+      }
+    }
+  }
+  return mergedTags;
+}
+
 function assertHasExampleTag(
   document: { jsDoc: JsDoc; location: Location },
 ): void {
-  const tags = document.jsDoc.tags?.filter((tag) =>
+  const tags = buildTags(document.jsDoc.tags).filter((tag) =>
     tag.kind === "example"
   ) as JsDocTagDocRequired[];
   if (tags === undefined || tags.length === 0) {
