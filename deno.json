@@ -20,6 +20,7 @@
     "typescript": "npm:typescript@^5.4.5",
     "zod": "https://deno.land/x/zod@v3.23.8/mod.ts",
     "@eyrie/app": "./mod.ts",
+    "@examples/": "./examples/",
     "@std/assert": "jsr:@std/assert@^1.0.2",
     "@std/fmt": "jsr:@std/fmt@^1.0.0",
     "@std/fs": "jsr:@std/fs@^1.0.1",

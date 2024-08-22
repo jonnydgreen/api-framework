@@ -50,15 +50,12 @@ function checkImportStatements(
     const { moduleSpecifier } = importDeclaration;
     const importPath = (moduleSpecifier as StringLiteral).text;
     const isRelative = importPath.startsWith(".");
-    // TODO(jonnydgreen): uncomment when the start path is known
-    // const isInternal = importPath.startsWith(
-    //   "",
-    // );
-    const isInternal = false;
+    const isInternal = importPath.startsWith("@eyrie/") ||
+      importPath.startsWith("@examples/");
     const isAllowedExternalDep = ALLOWED_EXTERNAL_DEPS.some((dep) =>
       importPath.startsWith(dep)
     );
-    const isStdLib = importPath.startsWith("https://deno.land/std/");
+    const isStdLib = importPath.startsWith("@std/");
     const { line } = sourceFile.getLineAndCharacterOfPosition(
       moduleSpecifier.pos,
     );

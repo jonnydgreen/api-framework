@@ -35,7 +35,7 @@ import type { ClassType, MaybePromise } from "./utils.ts";
  * ```ts
  * import { ServerContext, Container, buildControllerRoutes } from "@eyrie/app";
  * import { assert } from "@std/assert";
- * import { MessageController } from "./examples/basic/basic_controller.ts"
+ * import { MessageController } from "@examples/basic/basic_controller.ts"
  *
  * const ctx = new ServerContext("INFO");
  * const container = new Container

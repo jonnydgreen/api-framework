@@ -19,7 +19,7 @@ const registerFnName = "register";
  * ```ts
  * import { getRegistrationDefinition, ServerContext } from "@eyrie/app";
  * import { assertExists } from "@std/assert";
- * import { MessageController } from "./examples/basic/basic_controller.ts";
+ * import { MessageController } from "@examples/basic/basic_controller.ts";
  *
  * const ctx = new ServerContext("INFO");
  * const registration = await getRegistrationDefinition(ctx, MessageController);
@@ -50,7 +50,7 @@ const classRegistrations = new Map<symbol, ClassRegistration>();
  * @example Usage
  * ```ts no-assert
  * import { clearRegistration } from "@eyrie/app";
- * import { MessageController } from "./examples/basic/basic_controller.ts";
+ * import { MessageController } from "@examples/basic/basic_controller.ts";
  *
  * clearRegistration(MessageController);
  * ```
@@ -129,7 +129,7 @@ const typeKey = Symbol("class.type.key");
  * ```ts
  * import { registerClass, ClassRegistrationType } from "@eyrie/app";
  * import { assert } from "@std/assert";
- * import { Message } from "./examples/basic/basic_model.ts";
+ * import { Message } from "@examples/basic/basic_model.ts";
  *
  * const type = ClassRegistrationType.ObjectType;
  * const target = Message;
@@ -156,7 +156,7 @@ export function registerClass(
  * ```ts
  * import { getClassRegistrationByKey, registerClass, ClassRegistrationType } from "@eyrie/app";
  * import { assertExists } from "@std/assert";
- * import { Message } from "./examples/basic/basic_model.ts";
+ * import { Message } from "@examples/basic/basic_model.ts";
  *
  * const type = ClassRegistrationType.ObjectType;
  * const target = Message;
@@ -184,7 +184,7 @@ export function getClassRegistrationByKey(key: symbol): ClassRegistration {
  * ```ts
  * import { getRegistrationKey, registerClass, ClassRegistrationType } from "@eyrie/app";
  * import { assert } from "@std/assert";
- * import { Message } from "./examples/basic/basic_model.ts";
+ * import { Message } from "@examples/basic/basic_model.ts";
  *
  * const type = ClassRegistrationType.ObjectType;
  * const target = Message;
@@ -215,7 +215,7 @@ export function getRegistrationKey(target: unknown): symbol {
  * ```ts
  * import { maybeGetRegistrationKey, registerClass, ClassRegistrationType } from "@eyrie/app";
  * import { assert, assertExists } from "@std/assert";
- * import { Message } from "./examples/basic/basic_model.ts";
+ * import { Message } from "@examples/basic/basic_model.ts";
  *
  * const type = ClassRegistrationType.ObjectType;
  * const target = Message;

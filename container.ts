@@ -123,7 +123,7 @@ export class Container {
    * ```ts
    * import { Container, ServerContext, registerClass, ClassRegistrationType, getRegistrationKey } from "@eyrie/app";
    * import { assert } from "@std/assert";
-   * import { MessageController } from "./examples/basic/basic_controller.ts";
+   * import { MessageController } from "@examples/basic/basic_controller.ts";
    *
    * const type = ClassRegistrationType.Injectable;
    * const target = MessageController;
