@@ -1,26 +1,26 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
+import {
+  ContainerError,
+  Controller,
+  Get,
+  HttpMethod,
+  type Injectable,
+  type InjectableRegistration,
+  type MaybePromise,
+  Service,
+} from "@eyrie/app";
 import { assertEquals, assertRejects, assertStrictEquals } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
-import { teardownServer } from "./utils/teardown_utils.ts";
-import { Controller, Get, Service } from "../decorators.ts";
-import { HttpMethod } from "../router.ts";
-import type { MaybePromise } from "../utils.ts";
-import { ContainerError } from "../container.ts";
-import {
-  clearRegistration,
-  type Injectable,
-  type InjectableRegistration,
-} from "../registration.ts";
 
 Deno.test({
   name: "buildContainer() hooks up services using dependency injection",
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = await setupApplication([MessageController]);
-    const url = new URL("/v1/messages", origin);
+    await using setup = await setupApplication([MessageController]);
+    const url = new URL("/v1/messages", setup.origin);
 
     // Act
     const response = await fetch(url, { method: HttpMethod.GET });
@@ -38,7 +38,6 @@ Deno.test({
         content: "Container says hiya",
       },
     ]);
-    await teardownServer(server);
   },
 });
 
@@ -64,7 +63,6 @@ Deno.test({
       ContainerError,
       `Unable to register UnsupportedController: unsupported parameter definition at position 0`,
     );
-    clearRegistration(UnsupportedController);
   },
 });
 

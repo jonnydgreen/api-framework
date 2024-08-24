@@ -3,11 +3,15 @@
 import { assertEquals, assertStrictEquals } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
-import { teardownServer } from "./utils/teardown_utils.ts";
-import { Controller, Get } from "../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../registration.ts";
+import {
+  Controller,
+  Get,
+  HttpMethod,
+  type Injectable,
+  type InjectableRegistration,
+} from "@eyrie/app";
+// TODO: get from app
 import type { ErrorResponse } from "../response.ts";
-import { HttpMethod } from "../router.ts";
 
 Deno.test({
   name:
@@ -15,8 +19,8 @@ Deno.test({
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = await setupApplication([MessageController]);
-    const url = new URL("/v1/error", origin);
+    await using setup = await setupApplication([MessageController]);
+    const url = new URL("/v1/error", setup.origin);
 
     // Act
     const response = await fetch(url, { method: HttpMethod.GET });
@@ -32,7 +36,6 @@ Deno.test({
       status: 500,
       title: "Internal Server Error",
     });
-    await teardownServer(server);
   },
 });
 
@@ -42,8 +45,8 @@ Deno.test({
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = await setupApplication([MessageController]);
-    const url = new URL("/v1/error-string", origin);
+    await using setup = await setupApplication([MessageController]);
+    const url = new URL("/v1/error-string", setup.origin);
 
     // Act
     const response = await fetch(url, { method: HttpMethod.GET });
@@ -59,7 +62,6 @@ Deno.test({
       status: 500,
       title: "Internal Server Error",
     });
-    await teardownServer(server);
   },
 });
 
@@ -69,8 +71,8 @@ Deno.test({
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = await setupApplication([MessageController]);
-    const url = new URL("/v1/not-found", origin);
+    await using setup = await setupApplication([MessageController]);
+    const url = new URL("/v1/not-found", setup.origin);
 
     // Act
     const response = await fetch(url, { method: HttpMethod.GET });
@@ -83,7 +85,6 @@ Deno.test({
       status: 404,
       title: "Not Found",
     });
-    await teardownServer(server);
   },
 });
 
@@ -94,8 +95,8 @@ Deno.test({
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = await setupApplication([MessageController]);
-    const url = new URL("/v1/error", origin);
+    await using setup = await setupApplication([MessageController]);
+    const url = new URL("/v1/error", setup.origin);
 
     // Act
     const response = await fetch(url, { method: HttpMethod.POST });
@@ -108,7 +109,6 @@ Deno.test({
       status: 404,
       title: "Not Found",
     });
-    await teardownServer(server);
   },
 });
 

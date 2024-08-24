@@ -3,18 +3,24 @@
 import { assertStrictEquals } from "@std/assert";
 import { eTag } from "@std/http/etag";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
-import { teardownServer } from "./utils/teardown_utils.ts";
-import { Controller, Get } from "../decorators.ts";
-import type { Injectable, InjectableRegistration } from "../registration.ts";
-import { HttpMethod } from "../router.ts";
+import { createControllerWithGetRoute } from "./utils/controller_utils.ts";
+import { HttpMethod } from "@eyrie/app";
 
 Deno.test({
   name: "Headers() returns an etag matching the response body",
   permissions: setupPermissions(),
   async fn() {
     // Arrange
-    const [, server, origin] = await setupApplication([MessageController]);
-    const url = new URL("/v1/messages", origin);
+    const { controller } = createControllerWithGetRoute(
+      "/messages",
+      { path: "/" },
+      () => [
+        { id: "1", content: "Hello" },
+        { id: "2", content: "Hiya" },
+      ],
+    );
+    await using setup = await setupApplication([controller]);
+    const url = new URL("/v1/messages", setup.origin);
 
     // Act
     const response = await fetch(url, { method: HttpMethod.GET });
@@ -25,27 +31,5 @@ Deno.test({
     // Assert
     assertStrictEquals(etag, '"3a-4LK1qVw5XhkwLXL43X7Y0zU89+a"');
     assertStrictEquals(etag, calculatedEtag);
-    await teardownServer(server);
   },
 });
-
-@Controller("/messages")
-class MessageController implements Injectable {
-  public register(): InjectableRegistration {
-    return { dependencies: [] };
-  }
-
-  @Get({ path: "/" })
-  public getMessages() {
-    return [
-      {
-        id: "1",
-        content: "Hello",
-      },
-      {
-        id: "2",
-        content: "Hiya",
-      },
-    ];
-  }
-}

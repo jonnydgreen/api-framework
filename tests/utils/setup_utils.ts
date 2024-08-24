@@ -1,22 +1,29 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-import { Application, type ApplicationServer } from "../../application.ts";
-import type { ClassType } from "../../utils.ts";
+import {
+  Application,
+  type ApplicationServer,
+  type ClassType,
+} from "@eyrie/app";
+import { teardownServer } from "./teardown_utils.ts";
 
-export async function setupApplication(controllers: ClassType[]): Promise<[
-  application: Application,
-  server: ApplicationServer,
-  origin: URL,
-]> {
-  const app = new Application({ logLevel: "CRITICAL" });
+export async function setupApplication(
+  controllers: ClassType[],
+): Promise<SetupApplicationResult> {
+  const application = new Application({ logLevel: "CRITICAL" });
 
-  app.registerVersion({
+  application.registerVersion({
     version: "v1",
     controllers,
   });
 
-  const server = await app.listen({ port: 0 });
+  const server = await application.listen({ port: 0 });
   const origin = buildServerOrigin(server);
-  return [app, server, origin];
+  return {
+    application,
+    server,
+    origin,
+    [Symbol.asyncDispose]: () => teardownServer(server),
+  };
 }
 
 export function buildServerOrigin(server: ApplicationServer): URL {
@@ -36,4 +43,11 @@ export function setupPermissions(
     ...options,
     net: netPermissions,
   };
+}
+
+interface SetupApplicationResult {
+  application: Application;
+  server: ApplicationServer;
+  origin: URL;
+  [Symbol.asyncDispose]: () => Promise<void>;
 }

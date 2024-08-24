@@ -44,25 +44,6 @@ export function getRegistrationDefinition(
 const classRegistrations = new Map<symbol, ClassRegistration>();
 
 /**
- * Clear class registration. This is predominantly used for testing purposes.
- * @param target The class to clear
- * @typeParam T The type of the Class.
- * @example Usage
- * ```ts no-assert
- * import { clearRegistration } from "@eyrie/app";
- * import { MessageController } from "@examples/basic/basic_controller.ts";
- *
- * clearRegistration(MessageController);
- * ```
- */
-export function clearRegistration<T>(
-  target: ClassType<T>,
-): void {
-  const key = getRegistrationKey(target);
-  classRegistrations.delete(key);
-}
-
-/**
  * The class registration type. This is predominantly used to allow
  * one to select groups of registrations to be used for different
  * purposes.
@@ -171,6 +152,10 @@ export function getClassRegistrationByKey(key: symbol): ClassRegistration {
   assertExists(target, `Class is not registered for key: ${String(key)}`);
   return target;
 }
+
+// TODO: get rid of assertions as it's a bit of an anti-pattern to use them in functional code:
+//  - Assertions are used to find programming errors. Your programs must work just as well when all assertions are removed.
+//  - Exceptions, on the other hand, are for situations that can happen even when the program is perfect; they are caused by external influences, like hardware, network, users etc.
 
 // TODO(jonnydgreen): add a concepts page for all of this code, specifically registrations etc
 // TODO: some of this is DI specific so move this there

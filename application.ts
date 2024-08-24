@@ -176,7 +176,10 @@ export class Application {
         return new CoreDriverAdapter(this.ctx);
       }
       default: {
-        assertNever(driver, `Unsupported driver: ${driver}`);
+        assertNever(
+          driver,
+          new ApplicationError(`Unsupported driver: ${driver}`),
+        );
       }
     }
   }
@@ -268,4 +271,32 @@ export interface ApplicationVersionOptions {
    * will be `/v1/properties` when the version is `v1`.
    */
   controllers: ClassType[];
+}
+
+/**
+ * An application error that can be thrown when something goes wrong within the application lifecycle.
+ *
+ * @example Usage
+ * ```ts
+ * import { ApplicationError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new ApplicationError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
+ */
+export class ApplicationError extends Error {
+  /**
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { ApplicationError } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   *
+   * const error = new ApplicationError()
+   * assert(error.name === "ApplicationError");
+   * ```
+   */
+  override readonly name = "ApplicationError";
 }

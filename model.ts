@@ -40,7 +40,7 @@ export function Field<
   options: FieldOptions<TypeConstructor>,
 ): <Class>(
   this: unknown,
-  _target: Class,
+  target: Class,
   context: ClassFieldDecoratorContext<Class, Type>,
 ) => (this: Class, value: Type) => Type {
   function fieldDecorator<Class>(
@@ -48,10 +48,18 @@ export function Field<
     _target: Class,
     context: ClassFieldDecoratorContext<Class, Type>,
   ): (this: Class, value: Type) => Type {
-    const propertyName = context.name.toString();
+    const fieldName = context.name.toString();
     return function (this: Class, value: Type): Type {
-      if (context.static || context.private) {
-        return value;
+      const thisArg = this as ClassType | undefined;
+      if (context.static) {
+        throw new FieldError(
+          `Field() registration failed for '${thisArg?.name}.${fieldName}': static field registration is unsupported`,
+        );
+      }
+      if (context.private) {
+        throw new FieldError(
+          `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': private field registration is unsupported`,
+        );
       }
 
       const { key: classKey, schema: validation } = getTypeInfo(
@@ -68,7 +76,7 @@ export function Field<
         );
         models.set(
           classKey,
-          validation.extend({ [propertyName]: customValidation }),
+          validation.extend({ [fieldName]: customValidation }),
         );
         return value;
       }
@@ -78,32 +86,66 @@ export function Field<
         case "String": {
           models.set(
             classKey,
-            validation.extend({ [propertyName]: z.string() }),
+            validation.extend({ [fieldName]: z.string() }),
           );
           break;
         }
         case "Number": {
           models.set(
             classKey,
-            validation.extend({ [propertyName]: z.number() }),
+            validation.extend({ [fieldName]: z.number() }),
           );
           break;
         }
         case "Boolean": {
           models.set(
             classKey,
-            validation.extend({ [propertyName]: z.boolean() }),
+            validation.extend({ [fieldName]: z.boolean() }),
           );
           break;
         }
         default: {
-          throw new Error(`Unsupported type name: ${typeName}`);
+          throw new FieldError(
+            `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': unsupported type name '${typeName}'`,
+          );
         }
       }
       return value;
     };
   }
   return fieldDecorator;
+}
+
+// TODO: look into a generic error that forces one to define:
+//  - an error code
+//  - associated documentation link for that error code
+
+/**
+ * A field error that can be thrown when registering a Field for a model.
+ *
+ * @example Usage
+ * ```ts
+ * import { FieldError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new FieldError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
+ */
+export class FieldError extends Error {
+  /**
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { FieldError } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   *
+   * const error = new FieldError()
+   * assert(error.name === "FieldError");
+   * ```
+   */
+  override readonly name = "FieldError";
 }
 
 /**

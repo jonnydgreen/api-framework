@@ -1,12 +1,12 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assert, AssertionError } from "@std/assert";
+import { assert } from "@std/assert";
 
 /**
  * Asserts that a provided input is never actually passed.
  * This is useful when ensuring that all cases have been used.
  * @param _input The input (that should never be passed)
- * @param message A custom message to use when an input is passed
+ * @param error The error to throw when an input is passed
  * @returns Nothing
  *
  * @example Usage
@@ -27,18 +27,19 @@ import { assert, AssertionError } from "@std/assert";
  *     break;
  *   }
  *   default: {
- *     assertNever(input, "Should never reach here"); // Errors at compile time
+ *     assertNever(input, new Error("Should never reach here")); // Errors at compile time
  *   }
  * }
  * ```
  */
 export function assertNever(
   _input: never,
-  message: string,
+  error: Error,
 ): never {
-  throw new AssertionError(message);
+  throw error;
 }
 
+// TODO: remove
 /**
  * Asserts that an input is a function
  * @param input The input to check

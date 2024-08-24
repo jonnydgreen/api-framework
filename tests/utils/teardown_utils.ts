@@ -1,7 +1,9 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-import type { ApplicationServer } from "../../application.ts";
+import type { ApplicationServer } from "@eyrie/app";
 
-export function teardownServer(server: ApplicationServer): Promise<void> {
+export async function teardownServer(
+  server: ApplicationServer,
+): Promise<void> {
   server.shutdown();
-  return server.finished;
+  await server.finished;
 }

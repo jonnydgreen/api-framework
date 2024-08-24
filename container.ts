@@ -167,16 +167,22 @@ export class Container {
     target: ClassType<T>,
     ...dependencyTokens: symbol[]
   ): void {
-    if (!_containerMetadata.injectable.has(target.name)) {
+    const targetKey = getRegistrationKey(target);
+    let injectableMetadata = _containerMetadata.get(targetKey);
+    if (!injectableMetadata) {
       this.#makeInjectable(target);
-      _containerMetadata.injectable.set(target.name, true);
+      injectableMetadata = { registered: true, inject: new Map() };
+      _containerMetadata.set(targetKey, injectableMetadata);
     }
+
     let index = 0;
     for (const type of dependencyTokens) {
       const injectKey = `${target.name}.${index}`;
-      if (typeof _containerMetadata.inject.get(injectKey) === "undefined") {
+      if (
+        typeof injectableMetadata.inject.get(injectKey) === "undefined"
+      ) {
         decorate(inject(type) as ParameterDecorator, target, index++);
-        _containerMetadata.inject.set(injectKey, true);
+        injectableMetadata.inject.set(injectKey, true);
       }
     }
     this.#container.bind<T>(token).to(target).inSingletonScope();
@@ -192,7 +198,7 @@ export class Container {
 }
 
 /**
- * A container error that can be throw when building the container in {@linkcode buildContainer}.
+ * A container error that can be thrown when building the container in {@linkcode buildContainer}.
  * @example Usage
  * ```ts
  * import { ContainerError } from "@eyrie/app";
@@ -218,16 +224,9 @@ export class ContainerError extends Error {
   override readonly name = "ContainerError";
 }
 
-interface ContainerMetadata {
-  injectable: Map<string, boolean>;
+interface ContainerInjectableMetadata {
+  registered: boolean;
   inject: Map<string, unknown>;
 }
-/**
- * Used to store which injectables and dependencies have been decorated.
- * This allows one to run {@linkcode Container.build} multiple times in
- * one process.
- */
-const _containerMetadata: ContainerMetadata = {
-  injectable: new Map(),
-  inject: new Map(),
-};
+
+const _containerMetadata = new Map<symbol, ContainerInjectableMetadata>();
