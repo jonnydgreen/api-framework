@@ -51,6 +51,7 @@ export function Field<
     const fieldName = context.name.toString();
     return function (this: Class, value: Type): Type {
       const thisArg = this as ClassType | undefined;
+      const fieldSlug = `${thisArg?.constructor.name}.${fieldName}`;
       if (context.static) {
         throw new FieldDecoratorError(
           `Field() registration failed for '${thisArg?.name}.${fieldName}': static field registration is unsupported`,
@@ -62,7 +63,8 @@ export function Field<
         );
       }
 
-      const { key: classKey, schema: validation } = getTypeInfo(
+      const { key: classKey, schema: validation } = getRootTypeInfo(
+        fieldSlug,
         (this as ClassType).constructor as Fn,
       );
 
@@ -72,7 +74,7 @@ export function Field<
         const customValidation = models.get(fieldTypeKey);
         if (!exists(customValidation)) {
           throw new FieldDecoratorError(
-            `No validation schema exists for field type: ${fieldTypeKey.description}`,
+            `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': no validation schema exists for field type '${fieldTypeKey.description}'`,
           );
         }
         models.set(
@@ -236,14 +238,15 @@ export interface InputTypeOptions {
  * @typeParam Class The class type to get type info for.
  * @returns The type information
  */
-function getTypeInfo<Class extends ClassType>(
+function getRootTypeInfo<Class extends ClassType>(
+  fieldSlug: string,
   target: Class | Fn,
 ): TypeInfo<InstanceType<Class>> {
   const key = getRegistrationKey(target);
   const schema = models.get(key);
   if (!exists(schema)) {
     throw new FieldDecoratorError(
-      `No schema defined for ${target} with key: ${key.description}`,
+      `Field() registration failed for ${fieldSlug}: no schema defined for '${key.description}'`,
     );
   }
   return { key, schema: schema as TypeInfo<InstanceType<Class>>["schema"] };
@@ -261,7 +264,7 @@ export type TypeInfoSchema<Type extends z.ZodRawShape> = z.ZodObject<
 >;
 
 /**
- * The type information returned by {@linkcode getTypeInfo}.
+ * The type information returned by {@linkcode getRootTypeInfo}.
  */
 export interface TypeInfo<Type extends z.ZodRawShape> {
   /**

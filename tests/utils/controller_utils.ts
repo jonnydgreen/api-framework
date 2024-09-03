@@ -13,7 +13,7 @@ import {
   type RoutePath,
 } from "@eyrie/app";
 
-interface ControllerHandlerInput {
+export interface ControllerHandlerInput {
   ctx: Context | undefined;
   params: unknown | undefined;
   body?: unknown;

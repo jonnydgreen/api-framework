@@ -3,19 +3,24 @@
 import {
   type ClassType,
   Context,
+  Controller,
   Field,
   HttpMethod,
+  type InjectableRegistration,
   InputType,
+  Post,
+  RouteDecoratorError,
 } from "@eyrie/app";
 import {
   assert,
   assertEquals,
   assertInstanceOf,
   assertStrictEquals,
+  assertThrows,
 } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
-import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { createControllerWithPostRoute } from "./utils/controller_utils.ts";
+import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 
 Deno.test({
   name: "Post() registers a POST route",
@@ -175,4 +180,32 @@ Deno.test({
       assertEquals(JSON.parse(JSON.stringify(input.body)), inputBody);
     },
   });
+});
+
+Deno.test({
+  name: "Post() throws an error if registered on a static route",
+  permissions: setupPermissions(),
+  fn() {
+    // Arrange, Act & Assert
+    assertThrows(
+      () => {
+        @Controller("/")
+        // deno-lint-ignore no-unused-vars
+        class StaticController {
+          public register(): InjectableRegistration {
+            return { dependencies: [] };
+          }
+
+          @Post({ path: "/static" })
+          public static getRoute(
+            _ctx: Context,
+            _params: unknown,
+          ): void {
+          }
+        }
+      },
+      RouteDecoratorError,
+      "Post() registration failed for 'StaticController.getRoute': private and static field registration is unsupported",
+    );
+  },
 });

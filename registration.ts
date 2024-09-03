@@ -36,7 +36,7 @@ export function getRegistrationDefinition(
   );
   if (typeof descriptor?.value !== "function") {
     throw new RegistrationError(
-      `No registration function ${registerFnName}() defined for injectable: ${target}`,
+      `No registration function ${registerFnName}() defined for injectable: ${target.name}`,
     );
   }
   return descriptor.value(ctx);
@@ -80,19 +80,16 @@ export interface ClassRegistration {
  * @returns The class registrations and their key as an array of tuples
  * @example Usage
  * ```ts no-eval
- * import { getClassRegistrations } from "@eyrie/app";
+ * import { getClassRegistrations, ClassRegistrationType } from "@eyrie/app";
  * import { assert } from "@std/assert";
  *
- * const registrations = getClassRegistrations();
+ * const registrations = getClassRegistrations(ClassRegistrationType.Injectable);
  * assert(registrations.length);
  * ```
  */
 export function getClassRegistrations(
-  type?: ClassRegistrationType,
+  type: ClassRegistrationType,
 ): [symbol, ClassRegistration][] {
-  if (!type) {
-    return [...classRegistrations.entries()];
-  }
   return [...classRegistrations.entries()].filter(([, r]) => r.type === type);
 }
 

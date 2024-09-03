@@ -83,19 +83,14 @@ export function Get<ResponseType>(
     const key = Symbol(String(methodName));
     context.addInitializer(function (this: unknown) {
       const thisArg = this as ClassType;
-      const className = thisArg.constructor.name;
-      const methodSlug = `${className}.${String(methodName)}`;
+      if (context.private || context.static) {
+        throw new RouteDecoratorError(
+          `Get() registration failed for '${thisArg?.name}.${
+            String(methodName)
+          }': private and static field registration is unsupported`,
+        );
+      }
       const classKey = getRegistrationKey(thisArg.constructor);
-      if (context.private) {
-        throw new RouteDecoratorError(
-          `'Get' cannot decorate private property: ${methodSlug}`,
-        );
-      }
-      if (context.static) {
-        throw new RouteDecoratorError(
-          `'Get' cannot decorate static property: ${methodSlug}`,
-        );
-      }
       registerRoute(key, {
         method: HttpMethod.GET,
         path: options.path,
@@ -173,19 +168,14 @@ export function Post<RequestBody, ResponseType>(
     const key = Symbol(String(methodName));
     context.addInitializer(function (this: unknown) {
       const thisArg = this as ClassType;
-      const className = thisArg.constructor.name;
-      const methodSlug = `${className}.${String(methodName)}`;
+      if (context.private || context.static) {
+        throw new RouteDecoratorError(
+          `Post() registration failed for '${thisArg?.name}.${
+            String(methodName)
+          }': private and static field registration is unsupported`,
+        );
+      }
       const classKey = getRegistrationKey(thisArg.constructor);
-      if (context.private) {
-        throw new RouteDecoratorError(
-          `'Post' cannot decorate private property: ${methodSlug}`,
-        );
-      }
-      if (context.static) {
-        throw new RouteDecoratorError(
-          `'Post' cannot decorate static property: ${methodSlug}`,
-        );
-      }
       let body: symbol | undefined = undefined;
       if (options.body) {
         body = getRegistrationKey(options.body);

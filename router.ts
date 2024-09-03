@@ -131,9 +131,7 @@ function buildRouteHandler(
     const registeredClass = getClassRegistrationByKey(route.body);
     if (registeredClass.type !== ClassRegistrationType.InputType) {
       throw new RouterError(
-        `Registered class for key ${
-          String(route.body)
-        } is not registered as an InputType`,
+        `Registered class is not registered as an InputType for key: ${route.body.description}`,
       );
     }
     bodyClass = registeredClass.target;
@@ -174,11 +172,7 @@ async function deserialiseRequestBody(
   if (!target) {
     return;
   }
-  const body = await request.text();
-  if (!body) {
-    return;
-  }
-  const json = JSON.parse(body);
+  const json = await request.json();
   return Object.assign(new target(), json);
 }
 
@@ -333,9 +327,7 @@ function getControllerMetadataByRoute(
   const controller = controllers.get(route.controller);
   if (!exists(controller)) {
     throw new RouterError(
-      `Controller ${
-        String(route.controller)
-      } does not exist for route: ${route.method} ${route.path}`,
+      `Controller '${route.controller.description}' does not exist for route: ${route.method} ${route.path}`,
     );
   }
   return controller;

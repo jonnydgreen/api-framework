@@ -1,10 +1,17 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assertEquals, assertStrictEquals } from "@std/assert";
+import {
+  type Context,
+  Controller,
+  Get,
+  HttpMethod,
+  type InjectableRegistration,
+  RouteDecoratorError,
+} from "@eyrie/app";
+import { assertEquals, assertStrictEquals, assertThrows } from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
-import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 import { createControllerWithGetRoute } from "./utils/controller_utils.ts";
-import { HttpMethod } from "@eyrie/app";
+import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 
 Deno.test({
   name: "Get() registers a GET route",
@@ -38,5 +45,33 @@ Deno.test({
         content: "Hiya",
       },
     ]);
+  },
+});
+
+Deno.test({
+  name: "Get() throws an error if registered on a static route",
+  permissions: setupPermissions(),
+  fn() {
+    // Arrange, Act & Assert
+    assertThrows(
+      () => {
+        @Controller("/")
+        // deno-lint-ignore no-unused-vars
+        class StaticController {
+          public register(): InjectableRegistration {
+            return { dependencies: [] };
+          }
+
+          @Get({ path: "/static" })
+          public static getRoute(
+            _ctx: Context,
+            _params: unknown,
+          ): void {
+          }
+        }
+      },
+      RouteDecoratorError,
+      "Get() registration failed for 'StaticController.getRoute': private and static field registration is unsupported",
+    );
   },
 });
