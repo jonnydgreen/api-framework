@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
+import { HttpMethod } from "@eyrie/app";
 import { assertEquals } from "@std/assert";
-import { HttpMethod } from "../../router.ts";
 
 const url = new URL("v1/messages", "http://localhost:8080");
 const method = HttpMethod.GET;

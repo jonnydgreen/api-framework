@@ -1,83 +1,18 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-import { assert, assertExists } from "@std/assert";
+
+import type { Context } from "./context.ts";
 import {
-  ClassRegistrationType,
   getRegistrationKey,
   type Injectable,
-  registerClass,
+  type InjectableDecorator,
 } from "./registration.ts";
-import { HttpMethod, type RoutePath } from "./router.ts";
+import {
+  HttpMethod,
+  registerController,
+  registerRoute,
+  type RoutePath,
+} from "./router.ts";
 import type { ClassType, MaybePromise } from "./utils.ts";
-import type { Context } from "./context.ts";
-
-/**
- * The controller metadata returned by {@linkcode getControllerMetadataByRoute}.
- */
-export interface ControllerMetadata {
-  /**
-   * The path of the controller.
-   */
-  path: string;
-}
-
-const controllers = new Map<symbol, ControllerMetadata>();
-
-/**
- * Get controller metadata by route.
- *
- * If no controller is found, an error will be thrown.
- * @param route The route metadata used to find the controller.
- * @returns The found controller.
- *
- * @example Usage
- * ```ts no-assert no-eval
- * import { getControllerMetadataByRoute, RouteMetadata, HttpMethod } from "@eyrie/app";
- *
- * const route: RouteMetadata = {
- *   controller: Symbol('controller'),
- *   method: HttpMethod.GET,
- *   methodName: 'getMessages',
- *   path: '/messages',
- * };
- *
- * getControllerMetadataByRoute(route);
- * ```
- */
-export function getControllerMetadataByRoute(
-  route: RouteMetadata,
-): ControllerMetadata {
-  const controller = controllers.get(route.controller);
-  assertExists(
-    controller,
-    `Controller ${
-      String(route.controller)
-    } does not exist for route: ${route.method} ${route.path}`,
-  );
-  return controller;
-}
-
-const routes = new Map<symbol, RouteMetadata>();
-
-/**
- * Get {@linkcode RouteMetadata} by controller key.
- * @param controllerKey The controller key to get the {@linkcode RouteMetadata} by.
- * @returns The {@linkcode RouteMetadata} filtered by the controller key.
- * @example Usage
- * ```ts no-assert
- * import { getRouteMetadataByController } from "@eyrie/app";
- *
- * const key = Symbol('Controller key');
- *
- * getRouteMetadataByController(key);
- * ```
- */
-export function getRouteMetadataByController(
-  controllerKey: symbol,
-): RouteMetadata[] {
-  return [...routes.values()].filter((route) =>
-    route.controller === controllerKey
-  );
-}
 
 /**
  * Register a Controller with the provided options for the class.
@@ -109,79 +44,9 @@ export function Controller(path: RoutePath): InjectableDecorator {
     target: ClassType<Injectable>,
     _context: ClassDecoratorContext,
   ): void {
-    const key = registerClass({
-      type: ClassRegistrationType.Injectable,
-      target,
-    });
-    controllers.set(key, { path });
+    registerController(target, { path });
   }
   return controllerDecorator;
-}
-
-/**
- * Register a Service for use within the DI framework.
- *
- * @returns a decorator that will register the service.
- * @example Usage
- * ```ts no-assert
- * import { Service, Injectable, InjectableRegistration } from "@eyrie/app";
- *
- * @Service()
- * class MessageService implements Injectable {
- *   register(): InjectableRegistration {
- *     return { dependencies: [] };
- *   }
- *   public getMessages(): string[] {
- *     return ["Hello", "Hiya"];
- *   }
- * }
- * ```
- */
-export function Service(): InjectableDecorator {
-  function serviceDecorator(
-    target: ClassType<Injectable>,
-    _context: ClassDecoratorContext,
-  ): void {
-    registerClass({ type: ClassRegistrationType.Injectable, target });
-  }
-  return serviceDecorator;
-}
-
-/**
- * The required shape of classes decorated by the {@linkcode Service}
- * and the {@linkcode Controller} decorators.
- */
-export type InjectableDecorator = (
-  target: ClassType<Injectable>,
-  _context: ClassDecoratorContext,
-) => void;
-
-/**
- * The route metadata storing all the necessary route information as
- * returned by {@linkcode getRouteMetadataByController}.
- */
-export interface RouteMetadata {
-  /**
-   * The HTTP method of the route.
-   */
-  method: HttpMethod;
-  /**
-   * The URL path of the route.
-   */
-  path: RoutePath;
-  /**
-   * The registered controller key of the route.
-   */
-  controller: symbol;
-  /**
-   * The class method name for the registered route that
-   * will be used as the route handler.
-   */
-  methodName: string | symbol;
-  /**
-   * The request body type key associated with the registered route.
-   */
-  body?: symbol;
 }
 
 /**
@@ -221,18 +86,22 @@ export function Get<ResponseType>(
       const className = thisArg.constructor.name;
       const methodSlug = `${className}.${String(methodName)}`;
       const classKey = getRegistrationKey(thisArg.constructor);
-      assert(
-        !context.private && !context.static,
-        `'Get' cannot decorate private property: ${methodSlug}`,
-      );
-      if (!routes.has(key)) {
-        routes.set(key, {
-          method: HttpMethod.GET,
-          path: options.path,
-          controller: classKey,
-          methodName: methodName,
-        });
+      if (context.private) {
+        throw new RouteDecoratorError(
+          `'Get' cannot decorate private property: ${methodSlug}`,
+        );
       }
+      if (context.static) {
+        throw new RouteDecoratorError(
+          `'Get' cannot decorate static property: ${methodSlug}`,
+        );
+      }
+      registerRoute(key, {
+        method: HttpMethod.GET,
+        path: options.path,
+        controller: classKey,
+        methodName: methodName,
+      });
     });
   };
 }
@@ -307,23 +176,27 @@ export function Post<RequestBody, ResponseType>(
       const className = thisArg.constructor.name;
       const methodSlug = `${className}.${String(methodName)}`;
       const classKey = getRegistrationKey(thisArg.constructor);
-      assert(
-        !context.private && !context.static,
-        `'Post' cannot decorate private property: ${methodSlug}`,
-      );
+      if (context.private) {
+        throw new RouteDecoratorError(
+          `'Post' cannot decorate private property: ${methodSlug}`,
+        );
+      }
+      if (context.static) {
+        throw new RouteDecoratorError(
+          `'Post' cannot decorate static property: ${methodSlug}`,
+        );
+      }
       let body: symbol | undefined = undefined;
       if (options.body) {
         body = getRegistrationKey(options.body);
       }
-      if (!routes.has(key)) {
-        routes.set(key, {
-          method: HttpMethod.POST,
-          path: options.path,
-          controller: classKey,
-          methodName: methodName,
-          body,
-        });
-      }
+      registerRoute(key, {
+        method: HttpMethod.POST,
+        path: options.path,
+        controller: classKey,
+        methodName: methodName,
+        body,
+      });
     });
   };
 }
@@ -371,3 +244,32 @@ export type PostMethodDecorator<RequestBody, ResponseType> = (
   target: PostDecoratorTarget<RequestBody, ResponseType>,
   context: ClassMethodDecoratorContext,
 ) => void;
+
+/**
+ * A Decorator error that can be thrown when registering the application
+ * with decorators.
+ *
+ * @example Usage
+ * ```ts
+ * import { RouteDecoratorError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new RouteDecoratorError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
+ */
+export class RouteDecoratorError extends Error {
+  /**
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { RouteDecoratorError } from "@eyrie/app";
+   * import { assert, assertEquals } from "@std/assert";
+   *
+   * const error = new RouteDecoratorError()
+   * assertEquals(error.name, "RouteDecoratorError");
+   * ```
+   */
+  override readonly name = "RouteDecoratorError";
+}

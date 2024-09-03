@@ -1,6 +1,6 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { Field, FieldError, ObjectType } from "@eyrie/app";
+import { Field, FieldDecoratorError, ObjectType } from "@eyrie/app";
 import {
   assertInstanceOf,
   assertStrictEquals,
@@ -25,7 +25,7 @@ Deno.test({
 
     // Assert
     assertInstanceOf(error, Error);
-    assertInstanceOf(error, FieldError);
+    assertInstanceOf(error, FieldDecoratorError);
     assertStrictEquals(
       error.message,
       "Field() registration failed for 'Message.hello': static field registration is unsupported",
@@ -50,7 +50,7 @@ Deno.test({
 
     // Assert
     assertInstanceOf(error, Error);
-    assertInstanceOf(error, FieldError);
+    assertInstanceOf(error, FieldDecoratorError);
     assertStrictEquals(
       error.message,
       "Field() registration failed for 'Message.#hello': private field registration is unsupported",
@@ -77,7 +77,7 @@ Deno.test({
 
     // Assert
     assertInstanceOf(error, Error);
-    assertInstanceOf(error, FieldError);
+    assertInstanceOf(error, FieldDecoratorError);
     assertStrictEquals(
       error.message,
       "Field() registration failed for 'Message.hello': unsupported type name 'UnsupportedString'",

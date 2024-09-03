@@ -1,8 +1,12 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
+import {
+  Controller,
+  Get,
+  type Injectable,
+  type InjectableRegistration,
+} from "@eyrie/app";
 import { assertRejects } from "@std/assert";
-import type { Injectable, InjectableRegistration } from "../registration.ts";
-import { Controller, Get } from "../decorators.ts";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 
 Deno.test({

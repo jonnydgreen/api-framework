@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
-import { assertExists } from "@std/assert";
+
 import type { ServerContext } from "./context.ts";
-import { assertFunction, type ClassType, type MaybePromise } from "./utils.ts";
+import { type ClassType, exists, type MaybePromise } from "./utils.ts";
 
 const registerFnName = "register";
 
@@ -34,10 +34,11 @@ export function getRegistrationDefinition(
     target.prototype,
     registerFnName,
   );
-  assertFunction(
-    descriptor?.value,
-    `No registration function ${registerFnName}() defined for injectable: ${target}`,
-  );
+  if (typeof descriptor?.value !== "function") {
+    throw new RegistrationError(
+      `No registration function ${registerFnName}() defined for injectable: ${target}`,
+    );
+  }
   return descriptor.value(ctx);
 }
 
@@ -149,7 +150,11 @@ export function registerClass(
  */
 export function getClassRegistrationByKey(key: symbol): ClassRegistration {
   const target = classRegistrations.get(key);
-  assertExists(target, `Class is not registered for key: ${String(key)}`);
+  if (!exists(target)) {
+    throw new RegistrationError(
+      `Class is not registered for key: ${String(key)}`,
+    );
+  }
   return target;
 }
 
@@ -181,12 +186,13 @@ export function getClassRegistrationByKey(key: symbol): ClassRegistration {
  */
 export function getRegistrationKey(target: unknown): symbol {
   const key = maybeGetRegistrationKey(target);
-  assertExists(
-    key,
-    `Cannot get class key: ${
-      (target as ClassType).name
-    } has not been registered`,
-  );
+  if (!exists(key)) {
+    throw new RegistrationError(
+      `Cannot get class key: ${
+        (target as ClassType).name
+      } has not been registered`,
+    );
+  }
   return key;
 }
 
@@ -259,3 +265,70 @@ export interface Injectable {
    */
   register(ctx: ServerContext): MaybePromise<InjectableRegistration>;
 }
+
+/**
+ * A registration error that can be thrown when registering classes for use
+ * throughout the system.
+ *
+ * @example Usage
+ * ```ts
+ * import { RegistrationError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new RegistrationError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
+ */
+export class RegistrationError extends Error {
+  /**
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { RegistrationError } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   *
+   * const error = new RegistrationError()
+   * assert(error.name === "RegistrationError");
+   * ```
+   */
+  override readonly name = "RegistrationError";
+}
+
+/**
+ * Register a Service for use within the DI framework.
+ *
+ * @returns a decorator that will register the service.
+ * @example Usage
+ * ```ts no-assert
+ * import { Service, Injectable, InjectableRegistration } from "@eyrie/app";
+ *
+ * @Service()
+ * class MessageService implements Injectable {
+ *   register(): InjectableRegistration {
+ *     return { dependencies: [] };
+ *   }
+ *   public getMessages(): string[] {
+ *     return ["Hello", "Hiya"];
+ *   }
+ * }
+ * ```
+ */
+export function Service(): InjectableDecorator {
+  function serviceDecorator(
+    target: ClassType<Injectable>,
+    _context: ClassDecoratorContext,
+  ): void {
+    registerClass({ type: ClassRegistrationType.Injectable, target });
+  }
+  return serviceDecorator;
+}
+
+/**
+ * The required shape of classes decorated by the {@linkcode Service}
+ * and the {@linkcode Controller} decorators.
+ */
+export type InjectableDecorator = (
+  target: ClassType<Injectable>,
+  _context: ClassDecoratorContext,
+) => void;

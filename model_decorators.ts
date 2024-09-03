@@ -1,15 +1,15 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import * as z from "zod";
-import type { ClassType, Fn } from "./utils.ts";
+import { type ClassType, exists, type Fn } from "./utils.ts";
 import {
   ClassRegistrationType,
   getRegistrationKey,
   maybeGetRegistrationKey,
   registerClass,
 } from "./registration.ts";
-import { assertExists } from "@std/assert";
 
+// TODO(jonnydgreen): we most likely want custom types for this
 export type { ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 
 const models = new Map<symbol, ValidationMetadata>();
@@ -52,12 +52,12 @@ export function Field<
     return function (this: Class, value: Type): Type {
       const thisArg = this as ClassType | undefined;
       if (context.static) {
-        throw new FieldError(
+        throw new FieldDecoratorError(
           `Field() registration failed for '${thisArg?.name}.${fieldName}': static field registration is unsupported`,
         );
       }
       if (context.private) {
-        throw new FieldError(
+        throw new FieldDecoratorError(
           `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': private field registration is unsupported`,
         );
       }
@@ -70,10 +70,11 @@ export function Field<
       const fieldTypeKey = maybeGetRegistrationKey(options.type);
       if (fieldTypeKey) {
         const customValidation = models.get(fieldTypeKey);
-        assertExists(
-          customValidation,
-          `No validation schema exists for field type: ${fieldTypeKey.description}`,
-        );
+        if (!exists(customValidation)) {
+          throw new FieldDecoratorError(
+            `No validation schema exists for field type: ${fieldTypeKey.description}`,
+          );
+        }
         models.set(
           classKey,
           validation.extend({ [fieldName]: customValidation }),
@@ -105,7 +106,7 @@ export function Field<
           break;
         }
         default: {
-          throw new FieldError(
+          throw new FieldDecoratorError(
             `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': unsupported type name '${typeName}'`,
           );
         }
@@ -114,38 +115,6 @@ export function Field<
     };
   }
   return fieldDecorator;
-}
-
-// TODO: look into a generic error that forces one to define:
-//  - an error code
-//  - associated documentation link for that error code
-
-/**
- * A field error that can be thrown when registering a Field for a model.
- *
- * @example Usage
- * ```ts
- * import { FieldError } from "@eyrie/app";
- * import { assert } from "@std/assert";
- *
- * const error = new FieldError()
- * assert(error instanceof Error);
- * assert(typeof error.message === "string");
- * ```
- */
-export class FieldError extends Error {
-  /**
-   * The name of the error.
-   * @example Usage
-   * ```ts
-   * import { FieldError } from "@eyrie/app";
-   * import { assert } from "@std/assert";
-   *
-   * const error = new FieldError()
-   * assert(error.name === "FieldError");
-   * ```
-   */
-  override readonly name = "FieldError";
 }
 
 /**
@@ -160,52 +129,6 @@ export interface FieldOptions<Type> {
    * The type of the field type.
    */
   type: Type;
-}
-
-/**
- * Get the type information for a registered model.
- *
- * If no schema is defined for the model, then an error will be thrown.
- *
- * @param target The target model to get the type information from.
- * @typeParam Class The class type to get type info for.
- * @returns The type information
- */
-function getTypeInfo<Class extends ClassType>(
-  target: Class | Fn,
-): TypeInfo<InstanceType<Class>> {
-  const key = getRegistrationKey(target);
-  const schema = models.get(key);
-  assertExists(
-    schema,
-    `No schema defined for ${target} with key: ${key.description}`,
-  );
-  return { key, schema: schema as TypeInfo<InstanceType<Class>>["schema"] };
-}
-
-/**
- * The type info schema used in {@linkcode TypeInfo}.
- */
-export type TypeInfoSchema<Type extends z.ZodRawShape> = z.ZodObject<
-  Type,
-  "strip",
-  z.ZodTypeAny,
-  Type,
-  Type
->;
-
-/**
- * The type information returned by {@linkcode getTypeInfo}.
- */
-export interface TypeInfo<Type extends z.ZodRawShape> {
-  /**
-   * The registration key of the type information.
-   */
-  key: symbol;
-  /**
-   * The schema of the of the type information.
-   */
-  schema: TypeInfoSchema<Type>;
 }
 
 /**
@@ -305,6 +228,53 @@ export interface InputTypeOptions {
 }
 
 /**
+ * Get the type information for a registered model.
+ *
+ * If no schema is defined for the model, then an error will be thrown.
+ *
+ * @param target The target model to get the type information from.
+ * @typeParam Class The class type to get type info for.
+ * @returns The type information
+ */
+function getTypeInfo<Class extends ClassType>(
+  target: Class | Fn,
+): TypeInfo<InstanceType<Class>> {
+  const key = getRegistrationKey(target);
+  const schema = models.get(key);
+  if (!exists(schema)) {
+    throw new FieldDecoratorError(
+      `No schema defined for ${target} with key: ${key.description}`,
+    );
+  }
+  return { key, schema: schema as TypeInfo<InstanceType<Class>>["schema"] };
+}
+
+/**
+ * The type info schema used in {@linkcode TypeInfo}.
+ */
+export type TypeInfoSchema<Type extends z.ZodRawShape> = z.ZodObject<
+  Type,
+  "strip",
+  z.ZodTypeAny,
+  Type,
+  Type
+>;
+
+/**
+ * The type information returned by {@linkcode getTypeInfo}.
+ */
+export interface TypeInfo<Type extends z.ZodRawShape> {
+  /**
+   * The registration key of the type information.
+   */
+  key: symbol;
+  /**
+   * The schema of the of the type information.
+   */
+  schema: TypeInfoSchema<Type>;
+}
+
+/**
  * A type mapper that is used to convert types defined in decorators to those
  * defined on the decorated definitions.
  */
@@ -315,3 +285,35 @@ export type MapType<T> = T extends StringConstructor ? string
   : T extends null ? null
   : T extends ClassType ? InstanceType<T>
   : T;
+
+// TODO: look into a generic error that forces one to define:
+//  - an error code
+//  - associated documentation link for that error code
+
+/**
+ * A field error that can be thrown when registering a Field for a model.
+ *
+ * @example Usage
+ * ```ts
+ * import { FieldDecoratorError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new FieldDecoratorError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
+ */
+export class FieldDecoratorError extends Error {
+  /**
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { FieldDecoratorError } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   *
+   * const error = new FieldDecoratorError()
+   * assert(error.name === "FieldDecoratorError");
+   * ```
+   */
+  override readonly name = "FieldDecoratorError";
+}

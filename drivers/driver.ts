@@ -34,11 +34,28 @@ export interface Driver {
 }
 
 /**
- * Driver Not Implemented Error Options.
+ * A driver error that can be thrown when the driver fails in processing requests.
+ * @example Usage
+ * ```ts
+ * import { DriverError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new DriverError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
  */
-export interface DriverNotImplementedErrorOptions {
+export class DriverError extends Error {
   /**
-   * The message of the Driver Not Implemented Error Options.
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { DriverError } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   *
+   * const error = new DriverError()
+   * assert(error.name === "DriverError");
+   * ```
    */
-  message: string;
+  override readonly name = "DriverError";
 }

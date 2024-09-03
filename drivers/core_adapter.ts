@@ -1,16 +1,14 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assert } from "@std/assert";
 import type {
   ApplicationListenOptions,
   ApplicationServer,
 } from "../application.ts";
 import { Context, type ServerContext } from "../context.ts";
 import { buildErrorResponse, processResponse } from "../response.ts";
-import type { ControllerRoute } from "../router.ts";
-import type { Driver } from "./driver.ts";
-import { STATUS_CODE, type StatusCode } from "jsr:@std/http@^0.224.5/status";
+import { type ControllerRoute, NotFoundError } from "../router.ts";
 import type { MaybePromise } from "../utils.ts";
+import { type Driver, DriverError } from "./driver.ts";
 
 export class CoreDriverAdapter implements Driver {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;
@@ -25,10 +23,11 @@ export class CoreDriverAdapter implements Driver {
     const methods = this.#routes.get(route.path);
     if (methods) {
       const routeDetails = methods.get(route.method);
-      assert(
-        !routeDetails,
-        `Route ${route.method} ${route.path} already registered`,
-      );
+      if (routeDetails) {
+        throw new DriverError(
+          `Route ${route.method} ${route.path} already registered`,
+        );
+      }
       methods.set(route.method, route);
     } else {
       const routeDetails = new Map<string, ControllerRoute>();
@@ -83,14 +82,4 @@ export class CoreDriverAdapter implements Driver {
       `Listening on: http://${hostname}:${port}`,
     );
   }
-}
-
-export class HttpError extends Error {
-  public override readonly name = "NotFoundError";
-  public readonly statusCode: StatusCode = STATUS_CODE.InternalServerError;
-}
-
-export class NotFoundError extends HttpError {
-  public override readonly name = "NotFoundError";
-  public override readonly statusCode: StatusCode = STATUS_CODE.NotFound;
 }

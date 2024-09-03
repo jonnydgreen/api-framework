@@ -1,7 +1,5 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assert } from "@std/assert";
-
 /**
  * Asserts that a provided input is never actually passed.
  * This is useful when ensuring that all cases have been used.
@@ -39,29 +37,24 @@ export function assertNever(
   throw error;
 }
 
-// TODO: remove
 /**
- * Asserts that an input is a function
- * @param input The input to check
- * @param message A custom message to use when the input is not a function
- *
+ * Determines whether the input exists or not.
+ * @param actual The input
+ * @typeParam T The type of the input
+ * @returns Indicator for whether the input exists
  * @example Usage
- * ```ts no-eval no-assert
- * import { assertFunction } from "@eyrie/app"
+ * ```ts
+ * import { assert } from "@std/assert";
+ * import { exists } from "@eyrie/app";
  *
- * assertFunction(function hello(): void {}) // Ok
- * assertFunction("string") // Throws an error with default message
- * assertFunction("string", "Custom message") // Throws an error with custom message: "Custom message"
+ * const doesNotExist = exists(undefined);
+ * const doesExist = exists("hello");
+ * assert(!doesNotExist);
+ * assert(doesExist);
  * ```
  */
-export function assertFunction(
-  input: unknown,
-  message?: string,
-): asserts input is Fn {
-  assert(
-    typeof input === "function",
-    message || `Input ${input} is not a function`,
-  );
+export function exists<T>(actual: T): actual is NonNullable<T> {
+  return !(actual === undefined || actual === null);
 }
 
 /**

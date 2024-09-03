@@ -1,21 +1,59 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import { assert } from "@std/assert";
+import { STATUS_CODE, type StatusCode } from "@std/http";
 import { join } from "@std/path/join";
 import type { Container } from "./container.ts";
 import type { Context } from "./context.ts";
 import {
-  getControllerMetadataByRoute,
-  getRouteMetadataByController,
-  type RouteMetadata,
-} from "./decorators.ts";
-import {
   ClassRegistrationType,
   getClassRegistrationByKey,
   getRegistrationKey,
+  type Injectable,
+  registerClass,
 } from "./registration.ts";
 import { buildErrorResponse, processResponse } from "./response.ts";
-import type { ClassType, MaybePromise } from "./utils.ts";
+import { type ClassType, exists, type MaybePromise } from "./utils.ts";
+
+const controllers = new Map<symbol, ControllerMetadata>();
+const routes = new Map<symbol, RouteMetadata>();
+
+/**
+ * The controller metadata used to build the router in {@linkcode registerController}.
+ */
+export interface ControllerMetadata {
+  /**
+   * The path of the controller.
+   */
+  path: string;
+}
+
+/**
+ * The route metadata storing all the necessary route information
+ * and used to build the router in {@linkcode registerRoute}.
+ */
+export interface RouteMetadata {
+  /**
+   * The HTTP method of the route.
+   */
+  method: HttpMethod;
+  /**
+   * The URL path of the route.
+   */
+  path: RoutePath;
+  /**
+   * The registered controller key of the route.
+   */
+  controller: symbol;
+  /**
+   * The class method name for the registered route that
+   * will be used as the route handler.
+   */
+  methodName: string | symbol;
+  /**
+   * The request body type key associated with the registered route.
+   */
+  body?: symbol;
+}
 
 /**
  * Build the controller routes for a specified version.
@@ -91,12 +129,13 @@ function buildRouteHandler(
   let bodyClass: ClassType | undefined = undefined;
   if (route.body) {
     const registeredClass = getClassRegistrationByKey(route.body);
-    assert(
-      registeredClass.type === ClassRegistrationType.InputType,
-      `Registered class for key ${
-        String(route.body)
-      } is not registered as an InputType`,
-    );
+    if (registeredClass.type !== ClassRegistrationType.InputType) {
+      throw new RouterError(
+        `Registered class for key ${
+          String(route.body)
+        } is not registered as an InputType`,
+      );
+    }
     bodyClass = registeredClass.target;
   }
 
@@ -219,4 +258,207 @@ export interface ControllerRoute {
    * The handler for the controller route.
    */
   handler: RouteHandler;
+}
+
+/**
+ * Register a controller so its metadata can be used to build
+ * the application router. This is predominantly for use by the
+ * {@linkcode Controller} decorator.
+ *
+ * @param target The Controller to register
+ * @param metadata The Controller metadata to register
+ * @example Usage
+ * ```ts no-assert
+ * import { registerController, type InjectableRegistration, type Injectable } from "@eyrie/app";
+ *
+ * class MessageController implements Injectable {
+ *  register(): InjectableRegistration {
+ *    return { dependencies: [] };
+ *  }
+ * }
+ *
+ * registerController(MessageController, { path: '/messages' });
+ * ```
+ */
+export function registerController(
+  target: ClassType<Injectable>,
+  metadata: ControllerMetadata,
+): void {
+  const key = registerClass({
+    type: ClassRegistrationType.Injectable,
+    target,
+  });
+  controllers.set(key, metadata);
+}
+
+/**
+ * Register a router so its metadata can be used to build
+ * the application router. This is predominantly for use by the
+ * Http route decorators.
+ *
+ * @param key The unique route key to register
+ * @param metadata The route metadata to register
+ * @example Usage
+ * ```ts no-assert
+ * import { registerRoute, HttpMethod } from "@eyrie/app";
+ *
+ * const key = Symbol('route');
+ * const controller = Symbol('controller');
+ * const httpMethod = HttpMethod.GET;
+ * const methodName = 'classMethodName';
+ *
+ * registerRoute(key, { path: '/messages', controller, method: httpMethod, methodName });
+ * ```
+ */
+export function registerRoute(
+  key: symbol,
+  metadata: RouteMetadata,
+): void {
+  if (!routes.has(key)) {
+    routes.set(key, metadata);
+  }
+}
+
+function getRouteMetadataByController(
+  controllerKey: symbol,
+): RouteMetadata[] {
+  return [...routes.values()].filter((route) =>
+    route.controller === controllerKey
+  );
+}
+
+function getControllerMetadataByRoute(
+  route: RouteMetadata,
+): ControllerMetadata {
+  const controller = controllers.get(route.controller);
+  if (!exists(controller)) {
+    throw new RouterError(
+      `Controller ${
+        String(route.controller)
+      } does not exist for route: ${route.method} ${route.path}`,
+    );
+  }
+  return controller;
+}
+
+/**
+ * A Router error that can be thrown when building application routes.
+ *
+ * @example Usage
+ * ```ts
+ * import { RouterError } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ *
+ * const error = new RouterError()
+ * assert(error instanceof Error);
+ * assert(typeof error.message === "string");
+ * ```
+ */
+export class RouterError extends Error {
+  /**
+   * The name of the error.
+   * @example Usage
+   * ```ts
+   * import { RouterError } from "@eyrie/app";
+   * import { assert, assertEquals } from "@std/assert";
+   *
+   * const error = new RouterError()
+   * assertEquals(error.name, "RouterError");
+   * ```
+   */
+  override readonly name = "RouterError";
+}
+
+export { type StatusCode } from "@std/http";
+
+/**
+ * An {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status|HTTP error}
+ * that is thrown as part of the request lifecycle.
+ *
+ * @example Usage
+ * ```ts
+ * import { HttpError } from "@eyrie/app";
+ * import { STATUS_CODE } from "@std/http";
+ * import { assert, assertEquals } from "@std/assert";
+ *
+ * const error = new HttpError()
+ * assert(error.name === "HttpError");
+ * assertEquals(error.statusCode, STATUS_CODE.InternalServerError);
+ * ```
+ */
+export class HttpError extends Error {
+  /**
+   * The name of the HTTP error.
+   *
+   * @example Usage
+   * ```ts
+   * import { HttpError } from "@eyrie/app";
+   * import { STATUS_CODE } from "@std/http";
+   * import { assert, assertEquals } from "@std/assert";
+   *
+   * const error = new HttpError()
+   * assertEquals(error.name, "HttpError");
+   * ```
+   */
+  override readonly name: string = "HttpError";
+  /**
+   * The HTTP status code of the HTTP error.
+   *
+   * @example Usage
+   * ```ts
+   * import { HttpError } from "@eyrie/app";
+   * import { STATUS_CODE } from "@std/http";
+   * import { assert, assertEquals } from "@std/assert";
+   *
+   * const error = new HttpError()
+   * assertEquals(error.statusCode, STATUS_CODE.InternalServerError);
+   * ```
+   */
+  readonly statusCode: StatusCode = STATUS_CODE.InternalServerError;
+}
+
+/**
+ * An {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404|HTTP Not found}
+ * error that is thrown when the server cannot find the requested resource.
+ *
+ * @example Usage
+ * ```ts
+ * import { NotFoundError } from "@eyrie/app";
+ * import { STATUS_CODE } from "@std/http";
+ * import { assert, assertEquals } from "@std/assert";
+ *
+ * const error = new NotFoundError()
+ * assertEquals(error.name, "NotFoundError");
+ * assertEquals(error.statusCode, STATUS_CODE.NotFound);
+ * ```
+ */
+export class NotFoundError extends HttpError {
+  /**
+   * The name of the HTTP Not found error.
+   *
+   * @example Usage
+   * ```ts
+   * import { NotFoundError } from "@eyrie/app";
+   * import { STATUS_CODE } from "@std/http";
+   * import { assert, assertEquals } from "@std/assert";
+   *
+   * const error = new NotFoundError()
+   * assertEquals(error.name, "NotFoundError");
+   * ```
+   */
+  override readonly name = "NotFoundError";
+  /**
+   * The HTTP status code of the HTTP Not found error.
+   *
+   * @example Usage
+   * ```ts
+   * import { NotFoundError } from "@eyrie/app";
+   * import { STATUS_CODE } from "@std/http";
+   * import { assert, assertEquals } from "@std/assert";
+   *
+   * const error = new NotFoundError()
+   * assertEquals(error.statusCode, STATUS_CODE.NotFound);
+   * ```
+   */
+  override readonly statusCode: StatusCode = STATUS_CODE.NotFound;
 }

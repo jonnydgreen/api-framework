@@ -7,7 +7,7 @@ import {
   inject,
   injectable,
 } from "inversify";
-import { assertFunction, type ClassType, type Fn } from "./utils.ts";
+import type { ClassType, Fn } from "./utils.ts";
 import type { ServerContext } from "./context.ts";
 import {
   ClassRegistrationType,
@@ -144,10 +144,13 @@ export class Container {
   ): Fn {
     const registeredTarget = this.#container.get<T>(targetKey);
     const fn = registeredTarget[methodName];
-    assertFunction(
-      fn,
-      `No method ${String(methodName)} exists for class: ${String(targetKey)}`,
-    );
+    if (typeof fn !== "function") {
+      throw new ContainerError(
+        `No method ${String(methodName)} exists for class: ${
+          String(targetKey)
+        }`,
+      );
+    }
     return fn.bind(registeredTarget);
   }
 
