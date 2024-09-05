@@ -43,12 +43,9 @@ The OpenAPI spec generator will be split into a few parts:
    1. The connective tissue between the API framework and OpenAPI spec
    2. In theory, if one of the two sides changes, this class would be the only
       thing to change
-4. "combination" or nice-to-have public functions
-   1. Pieces everything together and is exported for use by API framework
-      developer users
-   2. Receives a constructed `apiFrameworkApp`, builds an object which follows
-      the API Framework interface, pipes it to transformer (step 3), and return
-      OpenAPI spec interface object
+4. Open API spec validator
+   1. TypeScript cannot validate full values within the generated OpenAPI spec.
+      There are some rules which must be captured at runtime.
 5. File Writer
    1. Generic class which can take in any object and write it as a JSON file
    2. Writes the final OpenAPI spec object to a JSON file
@@ -63,32 +60,17 @@ The OpenAPI spec generator will be split into a few parts:
       and then emitting the file
    3. Could be replaced with a CLI in the future
 
-### Example Workflow
-
-1. Developer reads guide
-2.
-
 ### Example Guide
 
 ```ts
-import { buildApp } from "./buildApp.ts";
-import { controllers } from "./example/controllers.ts";
-
 const apiFrameworkApp: APIFrameworkInterface = buildApp(controllers);
 
 const openAPISpec: OpenAPISpecInterface = buildOpenAPISpecFromAPIFrameworkApp(
-      apiFrameworkApp,
-      {
-            version: OpenAPISpecVersions.OpenAPISpecVersion310,
-      },
+   apiFrameworkApp,
+   {
+      version: OpenAPISpecVersions.OpenAPISpecVersion310,
+   },
 );
 
 writeObjectToJSONFile(openAPISpec);
 ```
-
-### API Framework interface
-
-This will define the structs available after iterating over the developers
-application. It will provide a consistent way for other tools (OpenAPI spec gen
-being the only one for now) to gather information about a developers
-application. For example, if a developers defines
