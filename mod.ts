@@ -4,6 +4,7 @@
 
 export * from "./application.ts";
 export * from "./drivers/driver.ts";
+export * from "./drivers/core_adapter.ts";
 export * from "./registration.ts";
 export * from "./route_decorators.ts";
 export * from "./model_decorators.ts";

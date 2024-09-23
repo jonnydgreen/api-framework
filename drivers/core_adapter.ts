@@ -10,16 +10,64 @@ import { type ControllerRoute, NotFoundError } from "../router.ts";
 import type { MaybePromise } from "../utils.ts";
 import { type Driver, DriverError } from "./driver.ts";
 
+/**
+ * The core driver adapter contains all the default logic from processing
+ * incoming requests. It is the default for the {@linkcode Application}.
+ *
+ * @example Default usage within the {@linkcode Application}.
+ * ```ts no-eval
+ * import { Application } from "@eyrie/app";
+ * import { assert } from "@std/assert";
+ * import { MessageController } from "../examples/basic/basic_controller.ts"
+ *
+ * const app = new Application();
+ *
+ * app.registerVersion({
+ *   version: "v1",
+ *   controllers: [MessageController],
+ * });
+ *
+ * const server = await app.listen();
+ * assert(server);
+ * ```
+ */
 export class CoreDriverAdapter implements Driver {
   readonly #routes: Map<string, Map<string, ControllerRoute>>;
   readonly #ctx: ServerContext;
 
+  /**
+   * The core driver adapter contains all the default logic from processing
+   * incoming requests.
+   *
+   * @param ctx The server context.
+   */
   constructor(ctx: Readonly<ServerContext>) {
     this.#routes = new Map();
     this.#ctx = ctx;
   }
 
-  public registerRoute(route: ControllerRoute): void {
+  /**
+   * Register a controller route.
+   * @param route The controller route input.
+   *
+   * @example Default usage within the {@linkcode Application}.
+   * ```ts no-eval
+   * import { Application } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   * import { MessageController } from "../examples/basic/basic_controller.ts"
+   *
+   * const app = new Application();
+   *
+   * app.registerVersion({
+   *   version: "v1",
+   *   controllers: [MessageController],
+   * });
+   *
+   * const server = await app.listen();
+   * assert(server);
+   * ```
+   */
+  registerRoute(route: ControllerRoute): void {
     const methods = this.#routes.get(route.path);
     if (methods) {
       const routeDetails = methods.get(route.method);
@@ -36,7 +84,29 @@ export class CoreDriverAdapter implements Driver {
     }
   }
 
-  public listen(
+  /**
+   * Start listening for requests, processing registered routes for each request.
+   * @param options - The required options to start listening for requests.
+   * @returns The application server that is listening on the defined port.
+   *
+   * @example Default usage within the {@linkcode Application}.
+   * ```ts no-eval
+   * import { Application } from "@eyrie/app";
+   * import { assert } from "@std/assert";
+   * import { MessageController } from "../examples/basic/basic_controller.ts"
+   *
+   * const app = new Application();
+   *
+   * app.registerVersion({
+   *   version: "v1",
+   *   controllers: [MessageController],
+   * });
+   *
+   * const server = await app.listen();
+   * assert(server);
+   * ```
+   */
+  listen(
     options: Required<ApplicationListenOptions>,
   ): ApplicationServer {
     const onListen = this.#onListen.bind(this);
