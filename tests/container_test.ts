@@ -4,18 +4,52 @@ import {
   ContainerError,
   Controller,
   Get,
+  getRegistrationKey,
   HttpMethod,
   type Injectable,
   type InjectableRegistration,
   type MaybePromise,
   Service,
 } from "@eyrie/app";
-import { assertEquals, assertRejects, assertStrictEquals } from "@std/assert";
+import {
+  assertEquals,
+  assertRejects,
+  assertStrictEquals,
+  assertThrows,
+} from "@std/assert";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { setupApplication, setupPermissions } from "./utils/setup_utils.ts";
 
 Deno.test({
-  name: "buildContainer() hooks up services using dependency injection",
+  name:
+    "Container.getClassMethod() throws an when no method function exists for a class",
+  permissions: setupPermissions(),
+  async fn() {
+    // Arrange
+    @Controller("/no-method-fn")
+    class NoMethodFnController implements Injectable {
+      register(): MaybePromise<InjectableRegistration> {
+        return {
+          dependencies: [],
+        };
+      }
+    }
+    await using app = await setupApplication([NoMethodFnController]);
+    const key = getRegistrationKey(NoMethodFnController);
+    const method = "unknown";
+
+    // Act & Assert
+    assertThrows(
+      () => app.application.container.getClassMethod(key, method),
+      ContainerError,
+      `Container build failed for ${key.description}.${method}: no method ${method} exists for class ${key.description}`,
+    );
+  },
+});
+
+Deno.test({
+  name:
+    "Container.buildContainer() hooks up services using dependency injection",
   permissions: setupPermissions(),
   async fn() {
     // Arrange
@@ -43,7 +77,32 @@ Deno.test({
 
 Deno.test({
   name:
-    "buildContainer() throws a startup error when an unsupported registration is defined",
+    "Container.buildContainer() throws a startup error when an unsupported registration is defined",
+  permissions: setupPermissions(),
+  async fn() {
+    // Arrange
+    @Controller("/unsupported")
+    class UnsupportedController implements Injectable {
+      public register(): MaybePromise<InjectableRegistration> {
+        return {
+          // deno-lint-ignore no-explicit-any
+          dependencies: [{ unsupported: "blah" } as any],
+        };
+      }
+    }
+
+    // Act & Assert
+    await assertRejects(
+      () => setupApplication([UnsupportedController]),
+      ContainerError,
+      `Unable to register UnsupportedController: unsupported parameter definition at position 0`,
+    );
+  },
+});
+
+Deno.test({
+  name:
+    "Container.buildContainer() throws a startup error when an unsupported registration is defined",
   permissions: setupPermissions(),
   async fn() {
     // Arrange

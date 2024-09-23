@@ -146,9 +146,11 @@ export class Container {
     const fn = registeredTarget[methodName];
     if (typeof fn !== "function") {
       throw new ContainerError(
-        `No method ${String(methodName)} exists for class: ${
-          String(targetKey)
-        }`,
+        `Container build failed for ${targetKey.description}.${
+          String(methodName)
+        }: no method ${
+          String(methodName)
+        } exists for class ${targetKey.description}`,
       );
     }
     return fn.bind(registeredTarget);

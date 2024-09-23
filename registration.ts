@@ -149,7 +149,7 @@ export function getClassRegistrationByKey(key: symbol): ClassRegistration {
   const target = classRegistrations.get(key);
   if (!exists(target)) {
     throw new RegistrationError(
-      `Class is not registered for key: ${String(key)}`,
+      `Class is not registered for key: ${key.description}`,
     );
   }
   return target;
