@@ -1,5 +1,11 @@
 # api-framework
 
+<!-- TODO(jonnydgreen): add more badges including treeware -->
+
+[![GitHub License](https://img.shields.io/github/license/jonnydgreen/api-framework?style=flat-square)](https://raw.githubusercontent.com/jonnydgreen/api-framework/main/LICENSE)
+[![codecov](https://codecov.io/gh/jonnydgreen/api-framework/branch/main/graph/badge.svg)](https://codecov.io/gh/jonnydgreen/api-framework)
+[![ci](https://github.com/jonnydgreen/api-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/jonnydgreen/api-framework/actions/workflows/ci.yml)
+
 API Framework
 
 **Note: This is an experimental package under active development. New releases
