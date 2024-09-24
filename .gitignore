@@ -2,3 +2,6 @@
 .tool-versions
 .DS_Store
 sandbox
+deno.lock
+cov_profile
+*.lcov

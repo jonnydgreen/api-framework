@@ -92,7 +92,6 @@ function registerClass<Class extends new (...args: any) => any>(target: Class) {
   );
   (target as any)[typeKey] = key;
   container.set(key, z.object({}));
-  // TODO: worth a discussion to determine when this should be run
   new target();
 }
 

@@ -1,68 +1,71 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
-import "npm:reflect-metadata";
-import { Container } from "npm:inversify";
-import { register } from "./kernel.ts";
+// import "npm:reflect-metadata";
+// import { Container } from "npm:inversify";
+// import { register, Registration } from "../container.ts";
 
-interface IKatana {
-  hit(): string;
-}
+// interface IKatana {
+//   hit(): string;
+// }
 
-class Katana implements IKatana {
-  public hit() {
-    return "cut!";
-  }
-}
+// class Katana implements IKatana {
+//   public hit() {
+//     return "cut!";
+//   }
+// }
 
-class Shuriken {
-  public throw() {
-    return "throw!";
-  }
-}
+// class Shuriken {
+//   public throw() {
+//     return "throw!";
+//   }
+// }
 
-class Ninja {
-  private _katana: IKatana;
-  private _shuriken: Shuriken;
+// class Ninja {
+//   private _katana: IKatana;
+//   private _shuriken: Shuriken;
 
-  public constructor(katana: IKatana, shuriken: Shuriken) {
-    this._katana = katana;
-    this._shuriken = shuriken;
-  }
+//   public constructor(katana: IKatana, shuriken: Shuriken) {
+//     this._katana = katana;
+//     this._shuriken = shuriken;
+//   }
 
-  public fight() {
-    return this._katana.hit();
-  }
-  public sneak() {
-    return this._shuriken.throw();
-  }
-}
+//   public fight() {
+//     return this._katana.hit();
+//   }
+//   public sneak() {
+//     return this._shuriken.throw();
+//   }
+// }
 
-export const TYPES = {
-  Warrior: {
-    Ninja: Symbol.for("Ninja"),
-  },
-  Weapon: {
-    Katana: Symbol.for("Katana"),
-    Shuriken: Symbol.for("Shuriken"),
-  },
-};
+// type Registrations = Record<
+//   string,
+//   Record<string, Registration>
+// >;
+// export const TYPES = {
+//   Warrior: {
+//     Ninja: { key: Symbol("Ninja"), target: Ninja },
+//   },
+//   Weapon: {
+//     Katana: { key: Symbol("Katana"), target: Katana },
+//     Shuriken: { key: Symbol("Shuriken"), target: Shuriken },
+//   },
+// } satisfies Registrations;
 
-const kernel = new Container();
-register(kernel, TYPES.Weapon.Katana, Katana);
-register(kernel, TYPES.Weapon.Shuriken, Shuriken);
-register(
-  kernel,
-  TYPES.Warrior.Ninja,
-  Ninja,
-  TYPES.Weapon.Katana,
-  TYPES.Weapon.Shuriken,
-);
+// const container = new Container();
+// register(container, TYPES.Weapon.Katana);
+// register(container, TYPES.Weapon.Shuriken);
+// register(
+//   container,
+//   TYPES.Warrior.Ninja,
+//   TYPES.Weapon.Katana,
+//   TYPES.Weapon.Shuriken,
+// );
 
-const ninja = kernel.get<Ninja>(TYPES.Warrior.Ninja);
-console.log(ninja, ninja.fight(), ninja.sneak());
+// const ninja = container.get<Ninja>(TYPES.Warrior.Ninja.key);
+// console.log(ninja, ninja.fight(), ninja.sneak());
 
-const katana = kernel.get<Katana>(TYPES.Weapon.Katana);
-console.log(katana, katana.hit());
+// const katana = container.get<Katana>(TYPES.Weapon.Katana.key);
+// console.log(katana, katana.hit());
 
-const shuriken = kernel.get<Shuriken>(TYPES.Weapon.Shuriken);
-console.log(shuriken, shuriken.throw());
+// const shuriken = container.get<Shuriken>(TYPES.Weapon.Shuriken.key);
+// console.log(shuriken, shuriken.throw());
