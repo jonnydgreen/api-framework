@@ -39,7 +39,7 @@
     ".git",
     "cov_profile",
     "spikes",
-    "docs"
+    "docs/designs"
   ],
   "lint": {
     "rules": {
