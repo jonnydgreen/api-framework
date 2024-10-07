@@ -2,6 +2,13 @@
 
 Key principles and conventions to follow when writing code:
 
+## General conventions
+
+- Prefer Deno over other tooling
+  - Additional tooling should be carefully considered as to whether it is truly
+    required
+- Keep things lightweight
+
 ## File/folder conventions
 
 - Filenames should be in lower snake case (e.g. `file_name.ts`)
