@@ -117,7 +117,7 @@ export class MessageService implements Injectable {
 
 It is then registered as part of an application version as follows:
 
-```ts
+```ts ignore
 import { Application } from "@eyrie/app";
 import { MessageController } from "@examples/di/di_controller.ts";
 

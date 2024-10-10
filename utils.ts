@@ -8,7 +8,7 @@
  * @returns Nothing
  *
  * @example Usage
- * ```ts no-eval no-assert
+ * ```ts no-assert
  * import { assertNever } from "@eyrie/app"
  *
  * enum Hello {
