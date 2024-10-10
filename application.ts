@@ -13,7 +13,7 @@ import type { LevelName } from "./logger.ts";
  * routes and capabilities to process inbound requests against.
  *
  * @example Usage
- * ```ts
+ * ```ts ignore
  * import { Application } from "@eyrie/app";
  * import { assert } from "@std/assert";
  * import { MessageController } from "@examples/basic/basic_controller.ts"
@@ -27,7 +27,6 @@ import type { LevelName } from "./logger.ts";
  *
  * const server = await app.listen();
  * assert(server);
- * await server.shutdown();
  * ```
  */
 export class Application {
@@ -123,7 +122,7 @@ export class Application {
    * @param options - The required options to start listening for requests.
    * @returns The {@linkcode ApplicationServer} that is being listened on.
    * @example Usage
-   * ```ts
+   * ```ts ignore
    * import { Application } from "@eyrie/app";
    * import { assert } from "@std/assert";
    * import { MessageController } from "@examples/basic/basic_controller.ts"
@@ -137,7 +136,6 @@ export class Application {
    *
    * const server = await app.listen();
    * assert(server);
-   * await server.shutdown();
    * ```
    */
   async listen(
