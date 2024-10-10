@@ -12,7 +12,9 @@
 Create the application. An application is always your starting point from which
 everything steams from.
 
-```ts
+<!-- TODO(jonnydgreen): remove ignore -->
+
+```ts ignore
 // app.ts
 const app = new Application();
 
@@ -22,7 +24,9 @@ app.listen();
 Before registering a route, you must setup everything associated with it. Here,
 we start by defining the relevant types.
 
-```ts
+<!-- TODO(jonnydgreen): remove ignore -->
+
+```ts ignore
 // message.ts
 @ObjectType()
 export class Message {
@@ -39,7 +43,9 @@ provision a controller which is responsible for the associated entity. In this
 case, we create a message controller that registers the `GET /v1/messages`
 endpoint.
 
-```ts
+<!-- TODO(jonnydgreen): remove ignore -->
+
+```ts ignore
 @Controller("/messages")
 export class MessageController {
   @Get({ responseType: List(Message) })

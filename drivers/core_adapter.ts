@@ -15,10 +15,10 @@ import { type Driver, DriverError } from "./driver.ts";
  * incoming requests. It is the default for the {@linkcode Application}.
  *
  * @example Default usage within the {@linkcode Application}.
- * ```ts no-eval
+ * ```ts ignore
  * import { Application } from "@eyrie/app";
  * import { assert } from "@std/assert";
- * import { MessageController } from "../examples/basic/basic_controller.ts"
+ * import { MessageController } from "@examples/basic/basic_controller.ts"
  *
  * const app = new Application();
  *
@@ -51,10 +51,10 @@ export class CoreDriverAdapter implements Driver {
    * @param route The controller route input.
    *
    * @example Default usage within the {@linkcode Application}.
-   * ```ts no-eval
+   * ```ts ignore
    * import { Application } from "@eyrie/app";
    * import { assert } from "@std/assert";
-   * import { MessageController } from "../examples/basic/basic_controller.ts"
+   * import { MessageController } from "@examples/basic/basic_controller.ts"
    *
    * const app = new Application();
    *
@@ -90,10 +90,10 @@ export class CoreDriverAdapter implements Driver {
    * @returns The application server that is listening on the defined port.
    *
    * @example Default usage within the {@linkcode Application}.
-   * ```ts no-eval
+   * ```ts ignore
    * import { Application } from "@eyrie/app";
    * import { assert } from "@std/assert";
-   * import { MessageController } from "../examples/basic/basic_controller.ts"
+   * import { MessageController } from "@examples/basic/basic_controller.ts"
    *
    * const app = new Application();
    *

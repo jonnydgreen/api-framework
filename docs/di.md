@@ -24,23 +24,28 @@ Based on the above it is recommend to use our own DI container solution.
   - Makes code generation a reality
   - Avoid black-box magic where possible
 
-Why use dependency injection?
-
-<!-- TODO(jonnydgreen): links and verify that this isn't nonsense.  -->
+**Why use dependency injection?**
 
 When developing services, it is good practice to use
 [SOLID principles](https://en.wikipedia.org/wiki/SOLID) for the software
-architecture. A big part of this is dependency injection which allows one to
-define all the required dependencies for a service across the entire stack. As
-part of this, software can be defined in a way that can scale in the future
-while keeping things simple in the short and long-term.
+architecture. The reason for this is to ensure the code that is written is clear
+and maintainable. It also ensures the codebase can be developed by multiple
+users at once which is crucial for team or even multiple team environments.
 
-A common issue with dependency injection is the magic nature of how it's set up.
-Here we aim to rectify this by keeping any registrations of entities within the
-container as close to the relevant definitions as possible. This can be achieved
-through the use of type-safe decorators in combinations with TypeScript
-interfaces. The following decorators will register services within the
-container:
+A big part of this is Dependency Injection (DI) which allows one to define all
+the required dependencies for a service across the entire stack. With this in
+place, software can be defined in a way that can scale in the future while
+keeping things simple in the short and long-term.
+
+A common pitfall with dependency injection is the magic nature of how it's set
+up in the library and the usage of it. Too often do developers come up against
+the mystery that is incorrectly defined dependency injection!
+
+Here, we aim to rectify this by keeping every close to source. For example,
+registrations of entities within the container are defined as close to the
+relevant definitions as possible. This can be achieved through the use of
+type-safe decorators in combination with TypeScript interfaces. The following
+decorators will register services within the DI container:
 
 - `@Controller()`
 - `@Service()`
@@ -48,62 +53,80 @@ container:
 For example, a controller can be defined as follows:
 
 ```ts
+import type { Message } from "@examples/di/di_model.ts";
+import { MessageService } from "@examples/di/di_service.ts";
+import {
+  Controller,
+  Get,
+  type Injectable,
+  type InjectableRegistration,
+} from "@eyrie/app";
+
 @Controller("/messages")
 export class MessageController implements Injectable {
-  constructor(messageService: MessageService) {}
+  readonly #messageService: MessageService;
 
-  // Registration of this dependency is added within the class
-  // and mandated by the presence of the Controller decorator.
-  // As a function, users retain full flexibility for
-  // registration of dependencies.
-  public register(): InjectableRegistration {
-    return { ctor: [MessageService] };
+  constructor(messageService: MessageService) {
+    this.#messageService = messageService;
   }
 
-  @Get({ path: "/", responseType: List(Message) })
-  public getMessages(): Message[] {
-    return [
-      {
-        id: "1",
-        content: "Hello",
-      },
-      {
-        id: "2",
-        content: "Hiya",
-      },
-    ];
+  // Registration of this dependency is added within the class
+  // and mandated by the presence of the `Controller` decorator.
+  // As a function or promise, users retain full flexibility for
+  // registration of dependencies.
+  public register(): InjectableRegistration {
+    return { dependencies: [{ class: MessageService }] };
+  }
+
+  @Get({ path: "/" })
+  public getLatestMessage(): Message {
+    return this.#messageService.getLatestMessage();
+  }
+}
+```
+
+And the dependency can be defined with the `Service` decorator:
+
+```ts
+import type { Message } from "@examples/di/di_model.ts";
+import {
+  type Injectable,
+  type InjectableRegistration,
+  type MaybePromise,
+  Service,
+} from "@eyrie/app";
+
+@Service()
+export class MessageService implements Injectable {
+  // Registration of this dependency is added within the class
+  // and mandated by the presence of the `Service` decorator.
+  // As a function or promise, users retain full flexibility for
+  // registration of dependencies.
+  public register(): MaybePromise<InjectableRegistration> {
+    return { dependencies: [] };
+  }
+
+  public getLatestMessage(): Message {
+    return {
+      id: "1",
+      content: "Hello",
+    };
   }
 }
 ```
 
 It is then registered as part of an application version as follows:
 
-```ts
+```ts ignore
+import { Application } from "@eyrie/app";
+import { MessageController } from "@examples/di/di_controller.ts";
+
 const app = new Application();
 
 app.registerVersion({
   version: "v1",
   controllers: [MessageController],
 });
-```
 
-Similarly, a service can be defined as follows:
-
-```ts
-@Service()
-class MessageService implements Injectable {
-  #messageRepository: MessageRepositoryContract;
-
-  constructor(messageRepository: MessageRepositoryContract) {
-    this.#messageRepository = messageRepository;
-  }
-
-  public init(): InjectableInit {
-    return { ctor: [{ class: MessageRepository }] };
-  }
-
-  public getMessages(): Message[] {
-    return this.#messageRepository.getMessages();
-  }
-}
+await app.listen();
 ```

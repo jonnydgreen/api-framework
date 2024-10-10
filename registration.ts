@@ -79,7 +79,7 @@ export interface ClassRegistration {
  * @param type The optional type of class registrations to fetch by.
  * @returns The class registrations and their key as an array of tuples
  * @example Usage
- * ```ts no-eval
+ * ```ts ignore
  * import { getClassRegistrations, ClassRegistrationType } from "@eyrie/app";
  * import { assert } from "@std/assert";
  *
