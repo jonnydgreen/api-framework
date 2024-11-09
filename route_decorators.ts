@@ -12,7 +12,7 @@ import {
   registerRoute,
   type RoutePath,
 } from "./router.ts";
-import type { ClassType, MaybePromise } from "./utils.ts";
+import type { ClassType, MaybeClassType, MaybePromise } from "./utils.ts";
 
 /**
  * Register a Controller with the provided options for the class.
@@ -158,7 +158,10 @@ export type GetMethodDecorator<ResponseType> = (
  * ```
  */
 export function Post<RequestBody, ResponseType>(
-  options: PostOptions<ClassType<RequestBody>, ResponseType>,
+  options: PostOptions<
+    MaybeClassType<RequestBody>,
+    MaybeClassType<ResponseType>
+  >,
 ): PostMethodDecorator<RequestBody, ResponseType> {
   return function post(
     _target: PostDecoratorTarget<RequestBody, ResponseType>,

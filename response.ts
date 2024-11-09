@@ -43,7 +43,7 @@ export interface ErrorResponse {
  * import { buildErrorResponse, Context, ServerContext } from "@eyrie/app";
  * import { assert } from "@std/assert";
  *
- * const serverContext = new ServerContext("INFO");
+ * const serverContext = new ServerContext("CRITICAL");
  * const request = new Request("http://example.com");
  * const ctx = new Context(serverContext, request)
  *
@@ -157,8 +157,12 @@ function serialiseResponseBody(
   body: object | BodyInit | null | undefined,
 ): BodyInit | null | undefined {
   let bodyInit: BodyInit | null | undefined = undefined;
-  if (typeof body === "string") {
-    bodyInit = body;
+  if (
+    typeof body === "string" ||
+    typeof body === "number" ||
+    typeof body === "boolean"
+  ) {
+    bodyInit = String(body);
   } else if (typeof body === "object") {
     // TODO(jonnydgreen): handle content types here
     bodyInit = JSON.stringify(body);

@@ -49,7 +49,7 @@ export class Application {
    * ```ts no-assert
    * import { Application } from "@eyrie/app";
    *
-   * const app = new Application();
+   * const app = new Application({ logLevel: "CRITICAL" });
    * app.ctx.log.info("Hello")
    * ```
    */
