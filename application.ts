@@ -13,10 +13,10 @@ import type { LevelName } from "./logger.ts";
  * routes and capabilities to process inbound requests against.
  *
  * @example Usage
- * ```ts no-eval
+ * ```ts ignore
  * import { Application } from "@eyrie/app";
  * import { assert } from "@std/assert";
- * import { MessageController } from "./examples/basic/basic_controller.ts"
+ * import { MessageController } from "@examples/basic/basic_controller.ts"
  *
  * const app = new Application();
  *
@@ -49,7 +49,7 @@ export class Application {
    * ```ts no-assert
    * import { Application } from "@eyrie/app";
    *
-   * const app = new Application();
+   * const app = new Application({ logLevel: "CRITICAL" });
    * app.ctx.log.info("Hello")
    * ```
    */
@@ -100,10 +100,10 @@ export class Application {
    * Register a version of an API.
    * @param options - The required options to register an API version.
    * @example Usage
-   * ```ts no-eval no-assert
+   * ```ts no-assert
    * import { Application } from "@eyrie/app";
    * import { assert } from "@std/assert";
-   * import { MessageController } from "./examples/basic/basic_controller.ts"
+   * import { MessageController } from "@examples/basic/basic_controller.ts"
    *
    * const app = new Application();
    *
@@ -122,10 +122,10 @@ export class Application {
    * @param options - The required options to start listening for requests.
    * @returns The {@linkcode ApplicationServer} that is being listened on.
    * @example Usage
-   * ```ts no-eval
+   * ```ts ignore
    * import { Application } from "@eyrie/app";
    * import { assert } from "@std/assert";
-   * import { MessageController } from "./examples/basic/basic_controller.ts"
+   * import { MessageController } from "@examples/basic/basic_controller.ts"
    *
    * const app = new Application();
    *

@@ -171,7 +171,7 @@ function assertSnippetsWork(
   }
   for (let snippet of snippets) {
     const delim = snippet.split(NEWLINE)[0];
-    if (delim?.includes("no-eval")) continue;
+    if (delim?.includes("ignore")) continue;
     // Trim the code block delimiters
     snippet = snippet.split(NEWLINE).slice(1, -1).join(NEWLINE);
     if (!delim?.includes("no-assert")) {

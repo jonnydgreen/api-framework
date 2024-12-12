@@ -48,3 +48,24 @@ session:
 ```shell
 deno task report
 ```
+
+## Editors
+
+Any editors that support the use of a [`.editorconfig`](../.editorconfig) file
+are supported in this repo.
+
+### VSCode
+
+For those using [VSCode](https://code.visualstudio.com/), the following settings
+are a good starting point:
+
+```jsonc
+{
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": [],
+  // Formatters
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "denoland.vscode-deno"
+}
+```

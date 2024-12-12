@@ -8,7 +8,7 @@
  * @returns Nothing
  *
  * @example Usage
- * ```ts no-eval no-assert
+ * ```ts no-assert
  * import { assertNever } from "@eyrie/app"
  *
  * enum Hello {
@@ -80,3 +80,15 @@ export type MaybePromise<T> = T | Promise<T>;
 // Acceptable function type definition
 // deno-lint-ignore no-explicit-any
 export type Fn = (...args: any[]) => any;
+
+/**
+ * A type mapper that is used to convert types defined in decorators to those
+ * defined on the decorated definitions.
+ */
+export type MapType<T> = T extends StringConstructor ? string
+  : T extends NumberConstructor ? number
+  : T extends BooleanConstructor ? boolean
+  : T extends undefined ? undefined
+  : T extends null ? null
+  : T extends ClassType ? InstanceType<T>
+  : T;

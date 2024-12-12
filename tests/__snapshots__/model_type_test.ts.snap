@@ -1,0 +1,397 @@
+export const snapshot = {};
+
+snapshot[`Model types > String > should error model field decorator of type 'String' does not map to field type of type 'number' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, number> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, string>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'number' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: string) => string' is not assignable to type 'void | ((this: Model, value: number) => number)'.
+  Type '(this: Model | undefined, value: string) => string' is not assignable to type '(this: Model, value: number) => number'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'number' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > String > should error model field decorator of type 'String' does not map to field type of type 'boolean' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, boolean> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, string>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'boolean' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: string) => string' is not assignable to type 'void | ((this: Model, value: boolean) => boolean)'.
+  Type '(this: Model | undefined, value: string) => string' is not assignable to type '(this: Model, value: boolean) => boolean'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'boolean' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > String > should error model field decorator of type 'String' does not map to field type of type 'symbol' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, symbol> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, string>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'symbol' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: string) => string' is not assignable to type 'void | ((this: Model, value: symbol) => symbol)'.
+  Type '(this: Model | undefined, value: string) => string' is not assignable to type '(this: Model, value: symbol) => symbol'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'symbol' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > String > should error model field decorator of type 'String' does not map to field type of type 'unknown' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, unknown> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, string>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'unknown' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: string) => string' is not assignable to type 'void | ((this: Model, value: unknown) => unknown)'.
+  Type '(this: Model | undefined, value: string) => string' is not assignable to type '(this: Model, value: unknown) => unknown'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'unknown' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > String > should error model field decorator of type 'String' does not map to field type of type 'undefined' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, undefined> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, string>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'undefined' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: string) => string' is not assignable to type 'void | ((this: Model, value: undefined) => undefined)'.
+  Type '(this: Model | undefined, value: string) => string' is not assignable to type '(this: Model, value: undefined) => undefined'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'undefined' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > String > should error model field decorator of type 'String' does not map to field type of type 'null' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, null> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, string>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'null' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: string) => string' is not assignable to type 'void | ((this: Model, value: null) => null)'.
+  Type '(this: Model | undefined, value: string) => string' is not assignable to type '(this: Model, value: null) => null'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'null' is not assignable to type 'string'.
+                    @Field({ description: "Field", type: String })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Number > should error model field decorator of type 'Number' does not map to field type of type 'string' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, string> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, number>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'string' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: number) => number' is not assignable to type 'void | ((this: Model, value: string) => string)'.
+  Type '(this: Model | undefined, value: number) => number' is not assignable to type '(this: Model, value: string) => string'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'string' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Number > should error model field decorator of type 'Number' does not map to field type of type 'boolean' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, boolean> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, number>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'boolean' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: number) => number' is not assignable to type 'void | ((this: Model, value: boolean) => boolean)'.
+  Type '(this: Model | undefined, value: number) => number' is not assignable to type '(this: Model, value: boolean) => boolean'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'boolean' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Number > should error model field decorator of type 'Number' does not map to field type of type 'symbol' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, symbol> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, number>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'symbol' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: number) => number' is not assignable to type 'void | ((this: Model, value: symbol) => symbol)'.
+  Type '(this: Model | undefined, value: number) => number' is not assignable to type '(this: Model, value: symbol) => symbol'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'symbol' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Number > should error model field decorator of type 'Number' does not map to field type of type 'unknown' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, unknown> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, number>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'unknown' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: number) => number' is not assignable to type 'void | ((this: Model, value: unknown) => unknown)'.
+  Type '(this: Model | undefined, value: number) => number' is not assignable to type '(this: Model, value: unknown) => unknown'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'unknown' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Number > should error model field decorator of type 'Number' does not map to field type of type 'undefined' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, undefined> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, number>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'undefined' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: number) => number' is not assignable to type 'void | ((this: Model, value: undefined) => undefined)'.
+  Type '(this: Model | undefined, value: number) => number' is not assignable to type '(this: Model, value: undefined) => undefined'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'undefined' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Number > should error model field decorator of type 'Number' does not map to field type of type 'null' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, null> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, number>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'null' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: number) => number' is not assignable to type 'void | ((this: Model, value: null) => null)'.
+  Type '(this: Model | undefined, value: number) => number' is not assignable to type '(this: Model, value: null) => null'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'null' is not assignable to type 'number'.
+                    @Field({ description: "Field", type: Number })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Boolean > should error model field decorator of type 'Boolean' does not map to field type of type 'string' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, string> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, boolean>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'string' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type 'void | ((this: Model, value: string) => string)'.
+  Type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type '(this: Model, value: string) => string'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'string' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Boolean > should error model field decorator of type 'Boolean' does not map to field type of type 'number' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, number> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, boolean>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'number' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type 'void | ((this: Model, value: number) => number)'.
+  Type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type '(this: Model, value: number) => number'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'number' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Boolean > should error model field decorator of type 'Boolean' does not map to field type of type 'symbol' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, symbol> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, boolean>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'symbol' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type 'void | ((this: Model, value: symbol) => symbol)'.
+  Type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type '(this: Model, value: symbol) => symbol'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'symbol' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Boolean > should error model field decorator of type 'Boolean' does not map to field type of type 'unknown' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, unknown> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, boolean>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'unknown' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type 'void | ((this: Model, value: unknown) => unknown)'.
+  Type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type '(this: Model, value: unknown) => unknown'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'unknown' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Boolean > should error model field decorator of type 'Boolean' does not map to field type of type 'undefined' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, undefined> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, boolean>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'undefined' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type 'void | ((this: Model, value: undefined) => undefined)'.
+  Type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type '(this: Model, value: undefined) => undefined'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'undefined' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;
+
+snapshot[`Model types > Boolean > should error model field decorator of type 'Boolean' does not map to field type of type 'null' 1`] = `
+\`Check file://__PATH__/\$deno\$eval.ts
+error: TS1240 [ERROR]: Unable to resolve signature of property decorator when called as an expression.
+  Argument of type 'ClassFieldDecoratorContext<Model, null> & { name: "field"; private: false; static: false; }' is not assignable to parameter of type 'ClassFieldDecoratorContext<Model | undefined, boolean>'.
+    The types returned by 'access.get(...)' are incompatible between these types.
+      Type 'null' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+TS1270 [ERROR]: Decorator function return type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type 'void | ((this: Model, value: null) => null)'.
+  Type '(this: Model | undefined, value: boolean) => boolean' is not assignable to type '(this: Model, value: null) => null'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'null' is not assignable to type 'boolean'.
+                    @Field({ description: "Field", type: Boolean })
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://__PATH__/\$deno\$eval.ts:5:22
+
+Found 2 errors.
+\`
+`;

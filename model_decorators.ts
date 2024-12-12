@@ -1,7 +1,7 @@
 // Copyright 2024-2024 the API framework authors. All rights reserved. MIT license.
 
 import * as z from "zod";
-import { type ClassType, exists, type Fn } from "./utils.ts";
+import { type ClassType, exists, type Fn, type MapType } from "./utils.ts";
 import {
   ClassRegistrationType,
   getRegistrationKey,
@@ -20,8 +20,8 @@ type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
  * The input type class method decorator that registers a field for a type.
  *
  * @param options The field type options
- * @typeParam TypeConstructor The constructor type associated with the {@linkcode Field} decorator.
- * @typeParam Type The mapped type associated with the {@linkcode Field} decorator.
+ * @typeParam Type The constructor type associated with the {@linkcode Field} decorator.
+ * @typeParam FieldType The mapped type associated with the {@linkcode Field} decorator.
  * @returns The {@linkcode Field} decorator function.
  * @example Usage
  * ```ts no-assert
@@ -34,22 +34,22 @@ type ValidationMetadata = z.ZodObject<z.ZodRawShape>;
  * ```
  */
 export function Field<
-  TypeConstructor extends ClassType,
-  Type extends MapType<TypeConstructor>,
+  Type,
+  FieldType extends MapType<Type>,
 >(
-  options: FieldOptions<TypeConstructor>,
+  options: FieldOptions<Type>,
 ): <Class>(
   this: unknown,
   target: Class,
-  context: ClassFieldDecoratorContext<Class, Type>,
-) => (this: Class, value: Type) => Type {
+  context: ClassFieldDecoratorContext<Class, FieldType>,
+) => (this: Class, value: FieldType) => FieldType {
   function fieldDecorator<Class>(
     this: unknown,
     _target: Class,
-    context: ClassFieldDecoratorContext<Class, Type>,
-  ): (this: Class, value: Type) => Type {
+    context: ClassFieldDecoratorContext<Class, FieldType>,
+  ): (this: Class, value: FieldType) => FieldType {
     const fieldName = context.name.toString();
-    return function (this: Class, value: Type): Type {
+    return function (this: Class, value: FieldType): FieldType {
       const thisArg = this as ClassType | undefined;
       const fieldSlug = `${thisArg?.constructor.name}.${fieldName}`;
       if (context.static) {
@@ -84,34 +84,40 @@ export function Field<
         return value;
       }
 
-      const typeName = options.type.name;
-      switch (typeName) {
-        case "String": {
-          models.set(
-            classKey,
-            validation.extend({ [fieldName]: z.string() }),
-          );
-          break;
+      if (typeof options.type === "function") {
+        const typeName = options.type.name;
+        switch (typeName) {
+          case "String": {
+            models.set(
+              classKey,
+              validation.extend({ [fieldName]: z.string() }),
+            );
+            break;
+          }
+          case "Number": {
+            models.set(
+              classKey,
+              validation.extend({ [fieldName]: z.number() }),
+            );
+            break;
+          }
+          case "Boolean": {
+            models.set(
+              classKey,
+              validation.extend({ [fieldName]: z.boolean() }),
+            );
+            break;
+          }
+          default: {
+            throw new FieldDecoratorError(
+              `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': unsupported type name '${typeName}'`,
+            );
+          }
         }
-        case "Number": {
-          models.set(
-            classKey,
-            validation.extend({ [fieldName]: z.number() }),
-          );
-          break;
-        }
-        case "Boolean": {
-          models.set(
-            classKey,
-            validation.extend({ [fieldName]: z.boolean() }),
-          );
-          break;
-        }
-        default: {
-          throw new FieldDecoratorError(
-            `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': unsupported type name '${typeName}'`,
-          );
-        }
+      } else {
+        throw new FieldDecoratorError(
+          `Field() registration failed for '${thisArg?.constructor.name}.${fieldName}': unsupported type '${options.type?.toString()}'`,
+        );
       }
       return value;
     };
@@ -276,18 +282,6 @@ export interface TypeInfo<Type extends z.ZodRawShape> {
    */
   schema: TypeInfoSchema<Type>;
 }
-
-/**
- * A type mapper that is used to convert types defined in decorators to those
- * defined on the decorated definitions.
- */
-export type MapType<T> = T extends StringConstructor ? string
-  : T extends NumberConstructor ? number
-  : T extends BooleanConstructor ? boolean
-  : T extends undefined ? undefined
-  : T extends null ? null
-  : T extends ClassType ? InstanceType<T>
-  : T;
 
 // TODO: look into a generic error that forces one to define:
 //  - an error code
